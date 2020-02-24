@@ -14,5 +14,3 @@ MLB_SEASONS = [
     {'season': 2017, 'start_date': '04/02/2017', 'end_date': '11/01/2017'},
     {'season': 2018, 'start_date': '03/29/2018', 'end_date': '10/28/2018'},
     {'season': 2019, 'start_date': '03/28/2019', 'end_date': '11/01/2019'}]
-
-VERIFY_REQUESTS = False

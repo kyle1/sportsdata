@@ -105,7 +105,7 @@ class Games:
     def _get_games(self, start_date, end_date):
         url = f'https://statsapi.web.nhl.com/api/v1/schedule?startDate={start_date}&endDate={end_date}&expand=schedule.linescore'
         #print('Getting games from ' + url)
-        games = requests.get(url, verify=False).json()
+        games = requests.get(url, verify=VERIFY_REQUESTS).json()
         for date in games['dates']:
             for game_data in date['games']:
                 game = Game(game_data)

@@ -37,7 +37,7 @@ if valid_args:
             nfl_week = get_nfl_week_by_date(today)
             url = f'{BASE_URL}{sport}/games/gameType/{nfl_week["game_type"]}/week/{nfl_week["week"]}'
             print('Getting data from ' + url)
-            response = requests.get(url, verify=False).json()
+            response = requests.get(url, verify=VERIFY_REQUESTS).json()
             games = response['data']
         elif sport == 'mlb':
             print('todo- format date and make get request using date string')
@@ -52,7 +52,7 @@ if valid_args:
                 continue
             url = f"{DARKSKY_BASE_URL}{DARKSKY_API_KEY}/{game['latitude']},{game['longitude']},{game['gameDateTime'] + gmt_offset}"
             print('Getting weather data from ' + url)
-            weather = requests.get(url, verify=False).json()
+            weather = requests.get(url, verify=VERIFY_REQUESTS).json()
             # weather['gameId'] = game['gameID']
             # dt = datetime.fromtimestamp(weather['currently']['time'])
             # weather['currently']['time'] = dt.isoformat()
@@ -96,7 +96,7 @@ if valid_args:
         for game_forecast in game_forecasts:
             print(game_forecast)
 
-        #response = requests.post(BASE_URL + sport + '/weather/', json=game_forecasts, verify=False).json()
+        #response = requests.post(BASE_URL + sport + '/weather/', json=game_forecasts, verify=VERIFY_REQUESTS).json()
         print(response['data'])
 else:
     print('Invalid arguments')

@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-# from ..constants import VERIFY_REQUESTS
+from ..constants import VERIFY_REQUESTS
 
 
 class Player:
@@ -65,7 +65,7 @@ class Players:
         # TODO- refer to https://github.com/dword4/nhlapi#teams
         url = f'https://statsapi.web.nhl.com/api/v1/teams?expand=team.roster'
         # print('Getting games from ' + url)
-        teams = requests.get(url, verify=False).json()
+        teams = requests.get(url, verify=VERIFY_REQUESTS).json()
         for team in teams['teams']:
             nhl_team_id = team['id']
             for person in team['roster']['roster']:

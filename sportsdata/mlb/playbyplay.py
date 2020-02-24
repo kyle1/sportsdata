@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-#from ..constants import VERIFY_REQUESTS
+from ..constants import VERIFY_REQUESTS
 from time import sleep
 
 
@@ -109,7 +109,7 @@ class PlayByPlay:
         return iter(self.__repr__())
 
     def _get_play_by_play(self, game_id):
-        pbp_json = requests.get(f'https://statsapi.mlb.com/api/v1/game/{game_id}/playByPlay', verify=False).json()
+        pbp_json = requests.get(f'https://statsapi.mlb.com/api/v1/game/{game_id}/playByPlay', verify=VERIFY_REQUESTS).json()
         for play_json in pbp_json['allPlays']:
             play = Play(game_id, play_json)
             self._plays.append(play)

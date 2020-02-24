@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-from mlb.constants import VERIFY_REQUESTS
+from ..constants import VERIFY_REQUESTS
 from time import sleep
 
 

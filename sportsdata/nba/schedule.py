@@ -1,7 +1,7 @@
 import nba.util
 import pandas as pd
 import requests
-#from ..constants import VERIFY_REQUESTS
+from ..constants import VERIFY_REQUESTS
 from datetime import datetime, timedelta
 from dateutil import tz
 
@@ -80,7 +80,7 @@ class Schedule:
     def _get_games(self, season, start_date, end_date):
         url = f'http://data.nba.com/data/10s/v2015/json/mobile_teams/nba/{season}/league/00_full_schedule.json'
         #print('Getting games from ' + url)
-        schedule = requests.get(url, verify=False).json()
+        schedule = requests.get(url, verify=VERIFY_REQUESTS).json()
         begin = datetime.strptime(start_date, '%m/%d/%Y').date()
         end = datetime.strptime(end_date, '%m/%d/%Y').date()
         for item in schedule['lscd']:

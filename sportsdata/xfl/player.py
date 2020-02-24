@@ -1,10 +1,10 @@
 # TODO: setup nba player classes
 import pandas as pd
 import requests
-# from ..constants import VERIFY_REQUESTS
+from ..constants import VERIFY_REQUESTS
+from constants import ROSTER_URLS
 from pyquery import PyQuery as pq
 from time import sleep
-from xfl.constants import ROSTER_URLS
 
 
 class Player:

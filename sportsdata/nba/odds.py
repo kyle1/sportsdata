@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-#from ..constants import VERIFY_REQUESTS
+from ..constants import VERIFY_REQUESTS
 from datetime import datetime
 
 
@@ -95,7 +95,7 @@ class GamesOdds:
     def _get_odds(self):
         url = 'https://www.bovada.lv/services/sports/event/v2/events/A/description/basketball/nba'
         print('Getting odds from ' + url)
-        odds_json = requests.get(url, verify=False).json()
+        odds_json = requests.get(url, verify=VERIFY_REQUESTS).json()
         if len(odds_json) == 0:
             print(f'No NHL odds found.')
             return

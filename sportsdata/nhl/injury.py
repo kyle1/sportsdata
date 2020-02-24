@@ -60,7 +60,7 @@ class Injuries:
         return iter(self.__repr__())
 
     def _get_injuries(self):
-        injuries_html = pq('https://www.hockey-reference.com/friv/injuries.cgi', verify=False)
+        injuries_html = pq('https://www.hockey-reference.com/friv/injuries.cgi', verify=VERIFY_REQUESTS)
         for table in injuries_html('table').items():
             if table.attr['id'] == 'injuries':
                 injuries_table = table

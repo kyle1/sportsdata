@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-#from ..constants import VERIFY_REQUESTS
+from ..constants import VERIFY_REQUESTS
 
 
 class Player:
@@ -91,7 +91,7 @@ class Players:
     def _get_players(self, season):
         url = f'https://statsapi.mlb.com/api/v1/sports/1/players?season={season}'
         #print('Getting games from ' + url)
-        players = requests.get(url, verify=False).json()
+        players = requests.get(url, verify=VERIFY_REQUESTS).json()
         for person in players['people']:
             player = Player(person, season)
             self._players.append(player)

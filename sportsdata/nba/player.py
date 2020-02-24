@@ -1,8 +1,8 @@
 # TODO: setup nba player classes
 import pandas as pd
 import requests
-# from ..constants import VERIFY_REQUESTS
-from nba.constants import NBA_API_TEAMS, PROXIES, NBA_REQUEST_HEADERS
+from ..constants import VERIFY_REQUESTS
+from constants import NBA_API_TEAMS, PROXIES, NBA_REQUEST_HEADERS
 from time import sleep
 
 
@@ -66,7 +66,7 @@ class Players:
         for team in NBA_API_TEAMS:
             url = f'https://stats.nba.com/stats/commonteamroster?LeagueID=&Season=2019-20&TeamID={team["team_id"]}'
             print(f'Getting roster from {url}')
-            roster = requests.get(url, PROXIES, headers=NBA_REQUEST_HEADERS, timeout=10, verify=False).json()
+            roster = requests.get(url, PROXIES, headers=NBA_REQUEST_HEADERS, timeout=10, verify=VERIFY_REQUESTS).json()
             for person in roster['resultSets']:
                 if person['name'] != 'CommonTeamRoster':
                     # Skip coaches

@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
-#from ..constants import VERIFY_REQUESTS
-from nba.constants import NBA_API_TEAMS
+from ..constants import VERIFY_REQUESTS
+from constants import NBA_API_TEAMS
 
 
 class Team:

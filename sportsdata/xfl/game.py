@@ -1,14 +1,14 @@
-import xfl.constants
-import xfl.util
 import pandas as pd
 import requests
-#from ..constants import VERIFY_REQUESTS
+from ..constants import VERIFY_REQUESTS
+from constants import CURRENT_SEASON
 from xfl.boxscore import Boxscores
 from xfl.scoring import ScoringPlays
 from datetime import datetime, timedelta
 from dateutil import tz
 from selenium import webdriver
 from time import sleep
+from util import get_game_ids_by_season_and_week
 
 
 class Game:
@@ -198,12 +198,12 @@ class Games:
         if 'season' in kwargs:
             season = kwargs['season']  # todo
             for week in range(1, 11):
-                week_game_ids = xfl.util.get_game_ids_by_season_and_week(season, week)
+                week_game_ids = get_game_ids_by_season_and_week(season, week)
                 game_ids.append(week_game_ids)
         elif 'week' in kwargs:
-            season = xfl.constants.CURRENT_SEASON
+            season = CURRENT_SEASON
             week = kwargs['week']
-            game_ids = xfl.util.get_game_ids_by_season_and_week(season, week)
+            game_ids = get_game_ids_by_season_and_week(season, week)
         elif 'id' in kwargs:
             game_id = kwargs['id']
             game_ids = [game_id]

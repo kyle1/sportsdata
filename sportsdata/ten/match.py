@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-#from ..constants import VERIFY_REQUESTS
+from ..constants import VERIFY_REQUESTS
 from datetime import datetime, timedelta
 from dateutil import tz
 
@@ -80,7 +80,7 @@ class Matches:
 
     def _get_matches(self, start_date, end_date):
         url = f'https://www.ultimatetennisstatistics.com/tournamentEvents'
-        matches = requests.get(url, verify=False).json()
+        matches = requests.get(url, verify=VERIFY_REQUESTS).json()
         # TODO
 
     @property

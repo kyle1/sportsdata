@@ -116,7 +116,7 @@ def get_games(seasons, weeks):
                 str(season) + "/" + \
                 'REG' + "/" + str(week) + ".json"
             print("Getting game data from " + url)
-            games = requests.get(url, verify=False).json()
+            games = requests.get(url, verify=VERIFY_REQUESTS).json()
 
             for game in games["gameScores"]:
                 # if game['gameSchedule']['season'] > end_season:
@@ -132,7 +132,7 @@ def get_games(seasons, weeks):
             for game_id in game_ids:
 
                 boxscore = requests.get(
-                    "https://feeds.nfl.com/feeds-rs/boxscore/" + str(game_id) + ".json", verify=False).json()
+                    "https://feeds.nfl.com/feeds-rs/boxscore/" + str(game_id) + ".json", verify=VERIFY_REQUESTS).json()
 
                 game_obj = {
                     'NflGameId': boxscore['gameSchedule']['gameId'],
@@ -398,7 +398,7 @@ def get_boxscores(seasons, weeks):
                 print(boxscore)
                 print('\n')
             response = requests.post(base_url + 'boxscores',
-                                     json=boxscores, verify=False).json()
+                                     json=boxscores, verify=VERIFY_REQUESTS).json()
             print(response)
             sleep(randint(20, 30))
 

@@ -22,7 +22,7 @@ class GameWeather:
     def _get_game_weather(self, game):
         darksky_url = 'todo'
         print('Getting weather data from ' + darksky_url)
-        weather = requests.get(darksky_url, verify=False).json()
+        weather = requests.get(darksky_url, verify=VERIFY_REQUESTS).json()
         setattr(self, '_xfl_game_id', game['xflGameId'])
         setattr(self, '_weather_date_time', datetime.fromtimestamp(weather['currently']['time']).isoformat())
         setattr(self, '_apparent_temperature': weather['currently']['apparentTemperature'])
@@ -66,7 +66,7 @@ class GameWeathers:
     def _get_game_weathers(self, week):
         url = 'todo'
         print('Getting game data from ' + url)
-        response = requests.get(url, verify=False).json()
+        response = requests.get(url, verify=VERIFY_REQUESTS).json()
         games = response['data']
         for game in games:
             if now > datetime.strptime(game['gameDateTime'], '%Y-%m-%dT%H:%M:%S'):

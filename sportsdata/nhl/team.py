@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-#from ..constants import VERIFY_REQUESTS
+from ..constants import VERIFY_REQUESTS
 
 
 class Team:
@@ -56,7 +56,7 @@ class Teams:
     def _get_teams(self):
         url = f'https://statsapi.web.nhl.com/api/v1/teams?sportId=1'
         #print('Getting games from ' + url)
-        teams = requests.get(url, verify=False).json()
+        teams = requests.get(url, verify=VERIFY_REQUESTS).json()
         for team_json in teams['teams']:
             team = Team(team_json)
             self._teams.append(team)

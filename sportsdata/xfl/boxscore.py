@@ -2,13 +2,13 @@ import pandas as pd
 import requests
 import xfl.util
 from bs4 import BeautifulSoup
+from collections import ChainMap
+from consants import CURRENT_SEASON
+from itertools import groupby
 from pyquery import PyQuery as pq
+from scoring import ScoringPlays
 from selenium import webdriver
 from time import sleep
-from xfl.scoring import ScoringPlays
-
-from itertools import groupby
-from collections import ChainMap
 
 
 class Boxscore:
@@ -121,7 +121,7 @@ class Boxscores:
         self._boxscores = []
 
         if 'week' in kwargs:
-            season = xfl.constants.CURRENT_SEASON
+            season = CURRENT_SEASON
             week = kwargs['week']
             game_ids = xfl.util.get_game_ids_by_season_and_week(season, week)
         elif 'id' in kwargs:
