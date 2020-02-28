@@ -6,7 +6,7 @@ from time import sleep
 
 class Boxscore:
     """
-    Get MLB player's boxscore data from a game.
+    MLB player's boxscore data from a game.
 
     Parameters
     ----------
@@ -86,31 +86,51 @@ class Boxscore:
             setattr(self, '_triples', box['stats']['batting']['triples'])
             setattr(self, '_home_runs', box['stats']['batting']['homeRuns'])
             setattr(self, '_runs_batted_in', box['stats']['batting']['rbi'])
-            setattr(self, '_bases_on_balls', box['stats']['batting']['baseOnBalls'])
-            setattr(self, '_intentional_bases_on_balls', box['stats']['batting']['intentionalWalks'])
+            setattr(self, '_bases_on_balls',
+                    box['stats']['batting']['baseOnBalls'])
+            setattr(self, '_intentional_bases_on_balls',
+                    box['stats']['batting']['intentionalWalks'])
             setattr(self, '_strikeouts', box['stats']['batting']['strikeOuts'])
-            setattr(self, '_hit_by_pitch', box['stats']['batting']['hitByPitch'])
-            setattr(self, '_sacrifice_hits', box['stats']['batting']['sacBunts'])
-            setattr(self, '_sacrifice_flies', box['stats']['batting']['sacFlies'])
-            setattr(self, '_grounded_into_double_play', box['stats']['batting']['groundIntoDoublePlay'])
-            setattr(self, '_stolen_bases', box['stats']['batting']['stolenBases'])
-            setattr(self, '_caught_stealing', box['stats']['batting']['caughtStealing'])
+            setattr(self, '_hit_by_pitch',
+                    box['stats']['batting']['hitByPitch'])
+            setattr(self, '_sacrifice_hits',
+                    box['stats']['batting']['sacBunts'])
+            setattr(self, '_sacrifice_flies',
+                    box['stats']['batting']['sacFlies'])
+            setattr(self, '_grounded_into_double_play',
+                    box['stats']['batting']['groundIntoDoublePlay'])
+            setattr(self, '_stolen_bases',
+                    box['stats']['batting']['stolenBases'])
+            setattr(self, '_caught_stealing',
+                    box['stats']['batting']['caughtStealing'])
 
         if has_pitching_stats:
-            setattr(self, '_starting_pitcher', box['stats']['pitching']['gamesStarted'])
-            setattr(self, '_pitching_win', 'wins' in box['stats']['pitching'] and box['stats']['pitching']['wins'] == 1)
-            setattr(self, '_innings_pitched', box['stats']['pitching']['inningsPitched'])
+            setattr(self, '_starting_pitcher',
+                    box['stats']['pitching']['gamesStarted'])
+            setattr(self, '_pitching_win',
+                    'wins' in box['stats']['pitching'] and box['stats']['pitching']['wins'] == 1)
+            setattr(self, '_innings_pitched',
+                    box['stats']['pitching']['inningsPitched'])
             setattr(self, '_allowed_hits', box['stats']['pitching']['hits'])
             setattr(self, '_allowed_runs', box['stats']['pitching']['runs'])
-            setattr(self, '_earned_runs', box['stats']['pitching']['earnedRuns'])
-            setattr(self, '_earned_run_average', box['stats']['pitching']['runsScoredPer9'] if box['stats']['pitching']['runsScoredPer9'] != '-.--' else None)
-            setattr(self, '_pitched_strikeouts', box['stats']['pitching']['strikeOuts'])
-            setattr(self, '_allowed_home_runs', box['stats']['pitching']['homeRuns'])
-            setattr(self, '_allowed_bases_on_balls', box['stats']['pitching']['baseOnBalls'])
-            setattr(self, '_batters_hit_by_pitch', box['stats']['pitching']['hitBatsmen'])
-            setattr(self, '_complete_game', box['stats']['pitching']['completeGames'] == 1)
-            setattr(self, '_shutout', box['stats']['pitching']['shutouts'] == 1)
-            setattr(self, '_quality_start', float(box['stats']['pitching']['inningsPitched']) >= 6.0 and box['stats']['pitching']['runs'] <= 3.0)
+            setattr(self, '_earned_runs',
+                    box['stats']['pitching']['earnedRuns'])
+            setattr(self, '_earned_run_average', box['stats']['pitching']['runsScoredPer9']
+                    if box['stats']['pitching']['runsScoredPer9'] != '-.--' else None)
+            setattr(self, '_pitched_strikeouts',
+                    box['stats']['pitching']['strikeOuts'])
+            setattr(self, '_allowed_home_runs',
+                    box['stats']['pitching']['homeRuns'])
+            setattr(self, '_allowed_bases_on_balls',
+                    box['stats']['pitching']['baseOnBalls'])
+            setattr(self, '_batters_hit_by_pitch',
+                    box['stats']['pitching']['hitBatsmen'])
+            setattr(self, '_complete_game',
+                    box['stats']['pitching']['completeGames'] == 1)
+            setattr(self, '_shutout', box['stats']
+                    ['pitching']['shutouts'] == 1)
+            setattr(self, '_quality_start', float(
+                box['stats']['pitching']['inningsPitched']) >= 6.0 and box['stats']['pitching']['runs'] <= 3.0)
 
     def _get_team_result(self, game, team):
         if game._away_team_score == game._home_team_score:

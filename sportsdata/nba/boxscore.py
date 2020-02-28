@@ -4,6 +4,21 @@ from constants import PROXIES, NBA_REQUEST_HEADERS
 
 
 class Boxscore:
+    """
+    NBA player's boxscore data from a game.
+
+    Parameters
+    ----------
+    game : dict
+        Dict that contains the game data.
+
+    headers : list (string)
+        A list of column headers
+
+    row : dict
+        Dict that contains the player's boxscore data. todo??
+    """
+
     def __init__(self, game, headers, row):
         self._nba_player_id = None
         self._nba_game_id = None
@@ -52,17 +67,21 @@ class Boxscore:
         setattr(self, '_season', game['Season'])  # todo
         setattr(self, '_away_team_id', game['AwayTeamId'])  # todo
         setattr(self, '_home_team_id', game['HomeTeamId'])  # todo
-        setattr(self, '_is_away', int(box['TEAM_ID']) == game['AwayTeamId'])  # todo
+        setattr(self, '_is_away', int(
+            box['TEAM_ID']) == game['AwayTeamId'])  # todo
         setattr(self, '_minutes_played', box['MIN'])
         setattr(self, '_field_goals', box['FGM'])
         setattr(self, '_field_goal_attempts', box['FGA'])
-        setattr(self, '_field_goal_pct', box['FG_PCT'] if box['FGA'] != 0 else None)
+        setattr(self, '_field_goal_pct',
+                box['FG_PCT'] if box['FGA'] != 0 else None)
         setattr(self, '_three_point_field_goals', box['FG3M'])
         setattr(self, '_three_point_field_goal_attempts', box['FG3A'])
-        setattr(self, '_three_point_field_goal_pct', box['FG3_PCT'] if box['FG3A'] != 0 else None)
+        setattr(self, '_three_point_field_goal_pct',
+                box['FG3_PCT'] if box['FG3A'] != 0 else None)
         setattr(self, '_free_throws', box['FTM'])
         setattr(self, '_free_throw_attempts', box['FTA'])
-        setattr(self, '_free_throw_pct', None if box['FTA'] == 0 else box['FTM'] / float(box['FTA']))
+        setattr(self, '_free_throw_pct',
+                None if box['FTA'] == 0 else box['FTM'] / float(box['FTA']))
         setattr(self, '_offensive_rebounds', box['OREB'])
         setattr(self, '_defensive_rebounds', box['DREB'])
         setattr(self, '_total_rebounds', box['REB'])
@@ -72,7 +91,8 @@ class Boxscore:
         setattr(self, '_turnovers', box['TO'])
         setattr(self, '_personal_fouls', box['PF'])
         setattr(self, '_points', box['PTS'])
-        setattr(self, '_plus_minus', None if box['PLUS_MINUS'] == None else int(box['PLUS_MINUS']))
+        setattr(self, '_plus_minus',
+                None if box['PLUS_MINUS'] == None else int(box['PLUS_MINUS']))
 
     @property
     def dataframe(self):
@@ -128,7 +148,8 @@ class Boxscores:
             print(game._nba_game_id_str)
             url = f'https://stats.nba.com/stats/boxscoretraditionalv2/?gameId={game._nba_game_id_str}&startPeriod=1&endPeriod=1&startRange=0&endRange=0&rangeType=0&startRange=0'
             print(url)
-            boxscore_data = requests.get(url, PROXIES, headers=NBA_REQUEST_HEADERS, timeout=10).json()
+            boxscore_data = requests.get(
+                url, PROXIES, headers=NBA_REQUEST_HEADERS, timeout=10).json()
             for results in boxscore_data['resultSets']:
                 if results['name'] != 'PlayerStats':
                     # Skip team-based stats
