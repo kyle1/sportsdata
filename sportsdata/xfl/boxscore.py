@@ -1,19 +1,19 @@
 import pandas as pd
 import requests
-import xfl.util
 from bs4 import BeautifulSoup
 from collections import ChainMap
-from consants import CURRENT_SEASON
+from ..xfl.constants import CURRENT_SEASON
 from itertools import groupby
 from pyquery import PyQuery as pq
-from scoring import ScoringPlays
+from ..xfl.scoring import ScoringPlays
 from selenium import webdriver
 from time import sleep
+from ..xfl.util import get_game_ids_by_season_and_week
 
 
 class Boxscore:
     """
-    XFL player's boxscore data from a game.
+    XFL player boxscore data from a game.
 
     Parameters
     ----------
@@ -25,9 +25,12 @@ class Boxscore:
 
     box_json : dict
         Dict that contains the player's boxscore data.
+
+    scoring_plays : todo
+        todo
     """
 
-    def __init__(self, game, team, box_json):
+    def __init__(self, game, team, box_json, scoring_plays):
         # self._xfl_player_id = None
         self._player_name = None
         self._xfl_game_id = None
@@ -71,13 +74,11 @@ class Boxscore:
         if 'PassingAttempts' in box:
             setattr(self, '_passing_completions', box['PassingCompletions'])
             setattr(self, '_passing_attempts', box['PassingAttempts'])
-            setattr(self, '_passing_completion_pct',
-                    box['PassingCompletionPct'])
+            setattr(self, '_passing_completion_pct', box['PassingCompletionPct'])
             setattr(self, '_passing_yards', box['PassingYards'])
             setattr(self, '_passing_long', box['PassingLong'])
             setattr(self, '_passing_touchdowns', box['PassingTouchdowns'])
-            setattr(self, '_passing_interceptions',
-                    box['PassingInterceptions'])
+            setattr(self, '_passing_interceptions', box['PassingInterceptions'])
             setattr(self, '_passing_rating', box['PassingRating'])
 
         if 'RushingAttempts' in box:
@@ -134,13 +135,25 @@ class Boxscore:
 
 
 class Boxscores:
+    """
+    XFL players boxscore data from games.
+
+    Parameters
+    ----------
+    week : int
+        XFL week number.
+
+    id : int
+        XFL game ID.
+    """
+
     def __init__(self, **kwargs):
         self._boxscores = []
 
         if 'week' in kwargs:
             season = CURRENT_SEASON
             week = kwargs['week']
-            game_ids = xfl.util.get_game_ids_by_season_and_week(season, week)
+            game_ids = get_game_ids_by_season_and_week(season, week)
         elif 'id' in kwargs:
             game_ids = [kwargs['id']]
 
@@ -251,31 +264,27 @@ class Boxscores:
         rushing_table = tables[0]
         rushing_body = rushing_table.find_element_by_class_name('body')
         rushing_rows = rushing_body.find_elements_by_class_name('row')
-        rushing_stats = self._parse_rushing_stats(
-            game_info, rushing_rows, is_away)
+        rushing_stats = self._parse_rushing_stats(game_info, rushing_rows, is_away)
 
         # Passing
         passing_table = tables[1]
         passing_body = passing_table.find_element_by_class_name('body')
         passing_rows = passing_body.find_elements_by_class_name('row')
-        passing_stats = self._parse_passing_stats(
-            game_info, passing_rows, is_away)
+        passing_stats = self._parse_passing_stats(game_info, passing_rows, is_away)
 
         # Receiving
         receiving_table = tables[2]
         receiving_body = receiving_table.find_element_by_class_name('body')
         receiving_rows = receiving_body.find_elements_by_class_name('row')
-        receiving_stats = self._parse_receiving_stats(
-            game_info, receiving_rows, is_away)
+        receiving_stats = self._parse_receiving_stats(game_info, receiving_rows, is_away)
 
         return rushing_stats + passing_stats + receiving_stats
 
     def _get_boxscores_by_game_ids(self, game_ids):
-        wd = webdriver.Chrome(
-            executable_path='C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe')
+        wd = webdriver.Chrome(executable_path='C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe')
         wd.maximize_window()
 
-        all_boxscores = []
+        boxscores = []
         for game_id in game_ids:
             url = f'https://stats.xfl.com/{game_id}'
             print('Getting boxscore data from ' + url)
@@ -286,10 +295,8 @@ class Boxscores:
                 '//div[contains(@class, "visitStroke")]')[0].get_attribute('class').split(' ')[1][4:]
             home_team = wd.find_elements_by_xpath(
                 '//div[contains(@class, "homeStroke")]')[0].get_attribute('class').split(' ')[1][4:]
-            visitor_score = wd.find_elements_by_xpath(
-                '//h2[@class = "score visitor"]')[0].text
-            home_score = wd.find_elements_by_xpath(
-                '//h2[@class = "score home"]')[0].text
+            visitor_score = wd.find_elements_by_xpath('//h2[@class = "score visitor"]')[0].text
+            home_score = wd.find_elements_by_xpath('//h2[@class = "score home"]')[0].text
 
             game_info = {
                 'game_id': game_id,
@@ -300,10 +307,8 @@ class Boxscores:
             }
 
             visitor_div = wd.find_element_by_id('visitorIndOffenseStats')
-            visitor_tables = visitor_div.find_elements_by_class_name('table')[
-                :3]
-            visitor_stats = self._parse_stat_tables(
-                game_info, visitor_tables, True)
+            visitor_tables = visitor_div.find_elements_by_class_name('table')[:3]
+            visitor_stats = self._parse_stat_tables(game_info, visitor_tables, True)
             home_div = wd.find_element_by_id('homeIndOffenseStats')
             home_tables = home_div.find_elements_by_class_name('table')[:3]
             home_stats = self._parse_stat_tables(game_info, home_tables, False)
@@ -316,14 +321,13 @@ class Boxscores:
 
             all_boxscores = all_boxscores + list(combined)
 
-            scoring_table = wd.find_elements_by_xpath(
-                '//div[@class = "statDisplay playlistScoring scoreTable"]')[0]
+            scoring_table = wd.find_elements_by_xpath('//div[@class = "statDisplay playlistScoring scoreTable"]')[0]
             scoring_plays = ScoringPlays(game_id, scoring_table)
             print(scoring_plays.dataframes)
 
-        # for b in all_boxscores:
-        #     boxscore = Boxscore(None, None, b)
-        #     self._boxscores.append(boxscore)
+        for box in boxscores:
+            boxscore = Boxscore(game_info, None, box, scoring_plays)
+            self._boxscores.append(boxscore)
 
         wd.close()
 

@@ -1,4 +1,5 @@
-from sportsdata.mlb.team import Teams
+from sportsdata.xfl.boxscore import Boxscores
 
-teams = Teams()
-print(teams.dataframes)
+boxscores = Boxscores(week=1)
+boxscores_df = boxscores.dataframes
+print(boxscores_df)
