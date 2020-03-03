@@ -22,7 +22,7 @@ class GameOdds:
 
     def _set_odds(self, odds):
         setattr(self, '_event_description', odds['description'])
-        setattr(self, '_event_start_time', datetime.fromtimestamp(odds['startTime']/1000))
+        setattr(self, '_event_start_time', datetime.fromtimestamp(odds['startTime']/1000).isoformat())
         for display_group in odds['displayGroups']:
             if display_group['description'] == 'Game Lines':
                 for market in display_group['markets']:
@@ -94,7 +94,7 @@ class GamesOdds:
         print('Getting odds from ' + url)
         odds_json = requests.get(url, verify=VERIFY_REQUESTS).json()
         if len(odds_json) == 0:
-            print(f'No NHL odds found.')
+            print(f'No XFL odds found.')
             return
         for event in odds_json[0]['events']:
             if event['type'] != 'GAMEEVENT':

@@ -9,6 +9,7 @@ from itertools import groupby
 from pyquery import PyQuery as pq
 from selenium import webdriver
 from time import sleep
+from ..xfl.util import get_game_ids_by_season_and_week
 
 
 class Boxscore:
@@ -133,13 +134,25 @@ class Boxscore:
 
 
 class Boxscores:
+    """
+    XFL players boxscore data from games.
+
+    Parameters
+    ----------
+    week : int
+        XFL week number.
+
+    id : int
+        XFL game ID.
+    """
+
     def __init__(self, **kwargs):
         self._boxscores = []
 
         if 'week' in kwargs:
             season = CURRENT_SEASON
             week = kwargs['week']
-            game_ids = xfl.util.get_game_ids_by_season_and_week(season, week)
+            game_ids = get_game_ids_by_season_and_week(season, week)
         elif 'id' in kwargs:
             game_ids = [kwargs['id']]
 
@@ -270,15 +283,17 @@ class Boxscores:
         wd = webdriver.Chrome(executable_path='C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe')
         wd.maximize_window()
 
-        all_boxscores = []
+        boxscores = []
         for game_id in game_ids:
             url = f'https://stats.xfl.com/{game_id}'
             print('Getting boxscore data from ' + url)
             wd.get(url)
             sleep(5)
 
-            visitor_team = wd.find_elements_by_xpath('//div[contains(@class, "visitStroke")]')[0].get_attribute('class').split(' ')[1][4:]
-            home_team = wd.find_elements_by_xpath('//div[contains(@class, "homeStroke")]')[0].get_attribute('class').split(' ')[1][4:]
+            visitor_team = wd.find_elements_by_xpath(
+                '//div[contains(@class, "visitStroke")]')[0].get_attribute('class').split(' ')[1][4:]
+            home_team = wd.find_elements_by_xpath(
+                '//div[contains(@class, "homeStroke")]')[0].get_attribute('class').split(' ')[1][4:]
             visitor_score = wd.find_elements_by_xpath('//h2[@class = "score visitor"]')[0].text
             home_score = wd.find_elements_by_xpath('//h2[@class = "score home"]')[0].text
 
@@ -309,8 +324,13 @@ class Boxscores:
             scoring_plays = ScoringPlays(game_id, scoring_table)
             #print(scoring_plays.dataframes)
 
+<<<<<<< HEAD
         for box in all_boxscores:
             boxscore = Boxscore(None, None, box, scoring_plays)
+=======
+        for box in boxscores:
+            boxscore = Boxscore(game_info, None, box, scoring_plays)
+>>>>>>> b43a6fc6d748d5ea6e270720af9422156b8f2a63
             self._boxscores.append(boxscore)
 
         wd.close()
