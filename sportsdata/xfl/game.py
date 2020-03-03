@@ -1,14 +1,14 @@
 import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
-from constants import CURRENT_SEASON
-from xfl.boxscore import Boxscores
-from xfl.scoring import ScoringPlays
+from .boxscore import Boxscores
+from .constants import CURRENT_SEASON
+from .scoring import ScoringPlays
+from .util import get_game_ids_by_season_and_week
 from datetime import datetime, timedelta
 from dateutil import tz
 from selenium import webdriver
 from time import sleep
-from util import get_game_ids_by_season_and_week
 
 
 class Game:
@@ -86,7 +86,9 @@ class Game:
         if wd == None:
             wd = webdriver.Chrome(executable_path='C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe')
             wd.maximize_window()
-        wd.get(f'https://stats.xfl.com/{game_id}')
+        url = f'https://stats.xfl.com/{game_id}'
+        print('Getting XFL game data from ' + url)
+        wd.get(url)
         sleep(5)
         game_stats_table = wd.find_elements_by_class_name('statDisplay.team')[0]   
         game_stats_bodies = game_stats_table.find_elements_by_class_name('body')
@@ -143,7 +145,7 @@ class Game:
         setattr(self, '_home_fourth_down_attempts', home_stats['Fourth Down'].split()[0].split('/')[1])
 
         #setattr(self, '_boxscores', Boxscores(id=game_id))
-        setattr(self, '_scoring_plays', ScoringPlays())
+        #setattr(self, '_scoring_plays', ScoringPlays())
 
     @property
     def dataframe(self):
@@ -191,6 +193,20 @@ class Game:
 
 
 class Games:
+    """
+    XFL games
+
+    Parameters
+    ----------
+    season : int
+        XFL season.
+
+    week : int
+        XFL week number.
+
+    id : int
+        XFL game ID.
+    """
     def __init__(self, **kwargs):
         self._games = []
 

@@ -23,7 +23,7 @@ class GameBoxscore:
         self._mlb_game_id = None
         self._season = None
         self._game_date_time = None
-        #self._game_status = None
+        self._game_status = None
         self._away_team_id = None
         self._away_runs = None
         self._away_fly_outs = None
