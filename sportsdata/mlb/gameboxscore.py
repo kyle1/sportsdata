@@ -1,9 +1,10 @@
-import mlb.util
 import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
+from .util import get_dates_by_season
 from datetime import datetime, timedelta
 from dateutil import tz
+from time import sleep
 
 
 # this is the boxscore with both team's data.
@@ -95,7 +96,7 @@ class GameBoxscore:
         # setattr(self, '_game_date_time', game_dt.isoformat())
         # setattr(self, '_game_date', game_dt.date().isoformat())
         # setattr(self, '_game_time', game_dt.time().isoformat())
-        # setattr(self, '_game_status', game['status']['detailedState'])
+        setattr(self, '_game_status', game['status']['detailedState'])
 
         setattr(self, '_away_team_id', game['teams']['away']['team']['id'])
         setattr(self, '_away_runs', game['teams']['away']['teamStats']['batting']['runs'])
@@ -132,8 +133,8 @@ class GameBoxscore:
         setattr(self, '_home_left_on_base', game['teams']['home']['teamStats']['batting']['leftOnBase'])
 
         setattr(self, '_home_plate_official_id', self._get_official_id_by_type(game['officials'], 'Home Plate'))
-        setattr(self, '_third_base_official_id', self._get_official_id_by_type(game['officials'], 'First Base'))
-        setattr(self, '_third_base_official_id', self._get_official_id_by_type(game['officials'], 'Second Base'))
+        setattr(self, '_first_base_official_id', self._get_official_id_by_type(game['officials'], 'First Base'))
+        setattr(self, '_second_base_official_id', self._get_official_id_by_type(game['officials'], 'Second Base'))
         setattr(self, '_third_base_official_id', self._get_official_id_by_type(game['officials'], 'Third Base'))
 
         # setattr(self, '_away_team_score', game['teams']['away']['score'])
@@ -165,7 +166,7 @@ class GameBoxscore:
             # 'GameDateTime': self._game_date_time,
             # 'GameDate': self._game_date,
             # 'GameTime': self._game_time,
-            # 'GameStatus': self._game_status,
+            'GameStatus': self._game_status,
             'AwayTeamId': self._away_team_id,
             'AwayRuns': self._away_runs,
             'AwayFlyOuts': self._away_fly_outs,
@@ -240,11 +241,11 @@ class GameBoxscores:
     """
 
     def __init__(self, **kwargs):
-        self._games = []
+        self._boxscores = []
 
         if 'season' in kwargs:
             season = kwargs['season']
-            start_date, end_date = mlb.util.get_dates_by_season(season)
+            start_date, end_date = get_dates_by_season(season)
         elif 'range' in kwargs:
             start_date = kwargs['range'][0]
             end_date = kwargs['range'][1]
@@ -255,15 +256,15 @@ class GameBoxscores:
             print('Invalid Game param(s)')
             return
 
-        self._get_games(start_date, end_date)
+        self._get_game_boxscores(start_date, end_date)
 
     def __repr__(self):
-        return self._games
+        return self._boxscores
 
     def __iter__(self):
         return iter(self.__repr__())
 
-    def _get_games(self, start_date, end_date):
+    def _get_game_boxscores(self, start_date, end_date):
         url = f'https://statsapi.mlb.com/api/v1/schedule?startDate={start_date}&endDate={end_date}&sportId=1'
         #print('Getting games from ' + url)
         games = requests.get(url, verify=VERIFY_REQUESTS).json()
@@ -282,8 +283,10 @@ class GameBoxscores:
                 # if game['gamePk'] not i game_ids:
                 #     continue
 
-                game = Game(json=game_data)
-                self._games.append(game)
+                boxscore = GameBoxscore(game_data['gamePk'])
+                self._boxscores.append(boxscore)
+                sleep(5)
+
 
     @property
     def dataframes(self):

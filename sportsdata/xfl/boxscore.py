@@ -1,18 +1,18 @@
 import pandas as pd
 import requests
-import xfl.util
+from .constants import CURRENT_SEASON
+from .scoring import ScoringPlays
+from .util import get_game_ids_by_season_and_week
 from bs4 import BeautifulSoup
 from collections import ChainMap
-from consants import CURRENT_SEASON
 from itertools import groupby
 from pyquery import PyQuery as pq
-from scoring import ScoringPlays
 from selenium import webdriver
 from time import sleep
 
 
 class Boxscore:
-    def __init__(self, game, team, box_json):
+    def __init__(self, game, team, box_json, scoring_plays):
         # self._xfl_player_id = None
         self._player_name = None
         self._xfl_game_id = None
@@ -43,9 +43,9 @@ class Boxscore:
         self._receiving_long = None
         self._receiving_touchdowns = None
 
-        self._get_boxscore_from_json(game, team, box_json)
+        self._get_boxscore_from_json(game, team, box_json, scoring_plays)
 
-    def _get_boxscore_from_json(self, game, team, box):
+    def _get_boxscore_from_json(self, game, team, box, scoring_plays):
         setattr(self, '_player_name', box['Player'])
         setattr(self, '_xfl_game_id', box['XflGameId'])
         setattr(self, '_away_team', box['AwayTeam'])
@@ -77,6 +77,19 @@ class Boxscore:
             setattr(self, '_receiving_average', box['ReceivingAverage'])
             setattr(self, '_receiving_long', box['ReceivingLong'])
             setattr(self, '_receiving_touchdowns', box['ReceivingTouchdowns'])
+
+        setattr(self, '_one_point_conversions', self._get_point_conversions(box, scoring_plays, 1))
+        setattr(self, '_two_point_conversions', self._get_point_conversions(box, scoring_plays, 2))
+        setattr(self, '_three_point_conversions', self._get_point_conversions(box, scoring_plays, 3))
+
+    def _get_point_conversions(self, box, scoring_plays, points):
+        conversions = 0
+        conversion_description = f'{points}pt attempt successful.'
+        for scoring_play in scoring_plays:
+            play_description = scoring_play._play_description
+            if box['Player'] in play_description and conversion_description in play_description:
+                conversions += 1
+        return conversions
 
     @property
     def dataframe(self):
@@ -112,6 +125,9 @@ class Boxscore:
             'ReceivingAverage': self._receiving_average,
             'ReceivingLong': self._receiving_long,
             'ReceivingTouchdowns': self._receiving_touchdowns,
+            'OnePointConversions': self._one_point_conversions,
+            'TwoPointConversions': self._two_point_conversions,
+            'ThreePointConversions': self._three_point_conversions,
         }
         return pd.DataFrame([fields_to_include], index=None)
 
@@ -291,11 +307,11 @@ class Boxscores:
 
             scoring_table = wd.find_elements_by_xpath('//div[@class = "statDisplay playlistScoring scoreTable"]')[0]
             scoring_plays = ScoringPlays(game_id, scoring_table)
-            print(scoring_plays.dataframes)
+            #print(scoring_plays.dataframes)
 
-        # for b in all_boxscores:
-        #     boxscore = Boxscore(None, None, b)
-        #     self._boxscores.append(boxscore)
+        for box in all_boxscores:
+            boxscore = Boxscore(None, None, box, scoring_plays)
+            self._boxscores.append(boxscore)
 
         wd.close()
 

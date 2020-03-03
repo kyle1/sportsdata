@@ -1,4 +1,4 @@
-from constants import MLB_SEASONS
+from .constants import MLB_SEASONS
 
 
 def get_dates_by_season(season):
