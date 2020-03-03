@@ -1,29 +1,29 @@
 An API for retrieving sports data.
 
-# MLB
+## MLB
 
-## Boxscore
+### Boxscore
 todo
 
-## Game
+### Game
 todo
 
-## Injury
+### Injury
 todo
 
-## Odds
+### Odds
 todo
 
-## Play-By-Play
+### Play-By-Play
 todo
 
-## Player
+### Player
 todo
 
-## Salary
+### Salary
 todo
 
-## Schedule
+### Schedule
 todo
 
 ## Team
