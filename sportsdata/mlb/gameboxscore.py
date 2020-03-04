@@ -1,6 +1,8 @@
 import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
+from .playbyplay import PlayByPlay
+from .playerboxscore import PlayerBoxscore, PlayerBoxscores
 from .util import get_dates_by_season
 from datetime import datetime, timedelta
 from dateutil import tz
@@ -40,7 +42,6 @@ class GameBoxscore:
         self._away_caught_stealing = None
         self._away_stolen_bases = None
         self._away_left_on_base = None
-
         self._home_team_id = None
         self._home_runs = None
         self._home_fly_outs = None
@@ -57,12 +58,13 @@ class GameBoxscore:
         self._home_caught_stealing = None
         self._home_stolen_bases = None
         self._home_left_on_base = None
-
         self._home_plate_official_id = None
         self._first_base_official_id = None
         self._second_base_official_id = None
         self._third_base_official_id = None
-
+        self._away_players = None
+        self._home_players = None
+        self._play_by_play = None
         # self._away_team_record_wins = None
         # self._away_team_record_losses = None
         # self._away_team_record_pct = None
@@ -96,8 +98,7 @@ class GameBoxscore:
         # setattr(self, '_game_date_time', game_dt.isoformat())
         # setattr(self, '_game_date', game_dt.date().isoformat())
         # setattr(self, '_game_time', game_dt.time().isoformat())
-        setattr(self, '_game_status', game['status']['detailedState'])
-
+        #setattr(self, '_game_status', game['status']['detailedState'])
         setattr(self, '_away_team_id', game['teams']['away']['team']['id'])
         setattr(self, '_away_runs', game['teams']['away']['teamStats']['batting']['runs'])
         setattr(self, '_away_fly_outs', game['teams']['away']['teamStats']['batting']['flyOuts'])
@@ -107,14 +108,14 @@ class GameBoxscore:
         setattr(self, '_away_home_runs', game['teams']['away']['teamStats']['batting']['homeRuns'])
         setattr(self, '_away_strikeouts', game['teams']['away']['teamStats']['batting']['strikeOuts'])
         setattr(self, '_away_base_on_balls', game['teams']['away']['teamStats']['batting']['baseOnBalls'])
-        setattr(self, '_away_intentional_base_on_balls', game['teams']['away']['teamStats']['batting']['intentionalWalks'])
+        setattr(self, '_away_intentional_base_on_balls', game['teams']
+                ['away']['teamStats']['batting']['intentionalWalks'])
         setattr(self, '_away_hits', game['teams']['away']['teamStats']['batting']['hits'])
         setattr(self, '_away_hit_by_pitch', game['teams']['away']['teamStats']['batting']['hitByPitch'])
         setattr(self, '_away_at_bats', game['teams']['away']['teamStats']['batting']['atBats'])
         setattr(self, '_away_caught_stealing', game['teams']['away']['teamStats']['batting']['caughtStealing'])
         setattr(self, '_away_stolen_bases', game['teams']['away']['teamStats']['batting']['stolenBases'])
         setattr(self, '_away_left_on_base', game['teams']['away']['teamStats']['batting']['leftOnBase'])
-
         setattr(self, '_home_team_id', game['teams']['home']['team']['id'])
         setattr(self, '_home_runs', game['teams']['home']['teamStats']['batting']['runs'])
         setattr(self, '_home_fly_outs', game['teams']['home']['teamStats']['batting']['flyOuts'])
@@ -124,7 +125,8 @@ class GameBoxscore:
         setattr(self, '_home_home_runs', game['teams']['home']['teamStats']['batting']['homeRuns'])
         setattr(self, '_home_strikeouts', game['teams']['home']['teamStats']['batting']['strikeOuts'])
         setattr(self, '_home_base_on_balls', game['teams']['home']['teamStats']['batting']['baseOnBalls'])
-        setattr(self, '_home_intentional_base_on_balls', game['teams']['home']['teamStats']['batting']['intentionalWalks'])
+        setattr(self, '_home_intentional_base_on_balls', game['teams']
+                ['home']['teamStats']['batting']['intentionalWalks'])
         setattr(self, '_home_hits', game['teams']['home']['teamStats']['batting']['hits'])
         setattr(self, '_home_hit_by_pitch', game['teams']['home']['teamStats']['batting']['hitByPitch'])
         setattr(self, '_home_at_bats', game['teams']['home']['teamStats']['batting']['atBats'])
@@ -153,6 +155,10 @@ class GameBoxscore:
         # setattr(self, '_games_in_series', game['gamesInSeries'])
         # setattr(self, '_extra_innings', 'todo')
 
+        setattr(self, '_away_players', PlayerBoxscores(self, 'away', game['teams']['away']))
+        setattr(self, '_home_players', PlayerBoxscores(self, 'home', game['teams']['home']))
+        setattr(self, '_play_by_play', PlayByPlay(game_id))
+
     def _get_official_id_by_type(self, officials, official_type):
         for official in officials:
             if official['officialType'] == official_type:
@@ -166,7 +172,7 @@ class GameBoxscore:
             # 'GameDateTime': self._game_date_time,
             # 'GameDate': self._game_date,
             # 'GameTime': self._game_time,
-            'GameStatus': self._game_status,
+            # 'GameStatus': self._game_status,
             'AwayTeamId': self._away_team_id,
             'AwayRuns': self._away_runs,
             'AwayFlyOuts': self._away_fly_outs,
@@ -199,7 +205,6 @@ class GameBoxscore:
             'HomeCaughtStealing': self._home_caught_stealing,
             'HomeStolenBases': self._home_stolen_bases,
             'HomeLeftOnBase': self._home_left_on_base,
-
             'HomePlateOfficialId': self._home_plate_official_id,
             'FirstBaseOfficialId': self._first_base_official_id,
             'SecondBaseOfficialId': self._second_base_official_id,
@@ -244,14 +249,11 @@ class GameBoxscores:
         self._boxscores = []
 
         if 'season' in kwargs:
-            season = kwargs['season']
-            start_date, end_date = get_dates_by_season(season)
+            start_date, end_date = get_dates_by_season(kwargs['season'])
         elif 'range' in kwargs:
-            start_date = kwargs['range'][0]
-            end_date = kwargs['range'][1]
+            start_date, end_date = kwargs['range'][0], kwargs['range'][1]
         elif 'date' in kwargs:
-            start_date = kwargs['date']
-            end_date = kwargs['date']
+            start_date, end_date = kwargs['date'], kwargs['date']
         else:
             print('Invalid Game param(s)')
             return
@@ -286,7 +288,6 @@ class GameBoxscores:
                 boxscore = GameBoxscore(game_data['gamePk'])
                 self._boxscores.append(boxscore)
                 sleep(5)
-
 
     @property
     def dataframes(self):

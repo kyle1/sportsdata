@@ -78,7 +78,7 @@ class Game:
         self._xfl_venue_id = None
 
         self._boxscores = None
-        self._scoring_plays = None #todo
+        self._scoring_plays = None  # todo
 
         self._set_game(game_id, wd)
 
@@ -90,7 +90,7 @@ class Game:
         print('Getting XFL game data from ' + url)
         wd.get(url)
         sleep(5)
-        game_stats_table = wd.find_elements_by_class_name('statDisplay.team')[0]   
+        game_stats_table = wd.find_elements_by_class_name('statDisplay.team')[0]
         game_stats_bodies = game_stats_table.find_elements_by_class_name('body')
         away_stats, home_stats = {}, {}
         for game_stats_body in game_stats_bodies:
@@ -103,7 +103,7 @@ class Game:
                 away_stats[col] = away_value
                 home_stats[col] = home_value
 
-        setattr(self, '_xfl_game_id', game_id) 
+        setattr(self, '_xfl_game_id', game_id)
         setattr(self, '_away_first_downs', away_stats['Total First Downs'])
         setattr(self, '_away_rush_attempts', away_stats['Attempts'])
         setattr(self, '_away_rush_yards', away_stats['Net Rushing Yards'])
@@ -112,12 +112,13 @@ class Game:
         setattr(self, '_away_pass_attempts', away_stats['Completed/Attempts'].split('/')[1].split()[0])
         setattr(self, '_away_pass_yards', away_stats['Net Passing Yards'])
         setattr(self, '_away_interceptions', away_stats['Interceptions'])
-        setattr(self, '_away_times_sacked', away_stats['Sacks/Yards'].split('/')[0]) #todo-check this is correct
-        setattr(self, '_away_yards_lost_from_sacks', away_stats['Sacks/Yards'].split('/')[1]) #todo-check this is correct
-        #todo- net pass yards?
+        setattr(self, '_away_times_sacked', away_stats['Sacks/Yards'].split('/')[0])  # todo-check this is correct
+        setattr(self, '_away_yards_lost_from_sacks',
+                away_stats['Sacks/Yards'].split('/')[1])  # todo-check this is correct
+        # todo- net pass yards?
         setattr(self, '_away_fumbles_lost', away_stats['Fumbles Lost'])
         setattr(self, '_away_turnovers', away_stats['Turnovers'])
-        setattr(self, '_away_penalty_yards', away_stats['Penalty Yards']) #yards from penalties?
+        setattr(self, '_away_penalty_yards', away_stats['Penalty Yards'])  # yards from penalties?
         setattr(self, '_away_total_yards', away_stats['Total Net Yards'])
         setattr(self, '_away_third_down_conversions', away_stats['Third Down'].split()[0].split('/')[0])
         setattr(self, '_away_third_down_attempts', away_stats['Third Down'].split()[0].split('/')[1])
@@ -132,12 +133,13 @@ class Game:
         setattr(self, '_home_pass_attempts', home_stats['Completed/Attempts'].split('/')[1].split()[0])
         setattr(self, '_home_pass_yards', home_stats['Net Passing Yards'])
         setattr(self, '_home_interceptions', home_stats['Interceptions'])
-        setattr(self, '_home_times_sacked', home_stats['Sacks/Yards'].split('/')[0]) #todo-check this is correct
-        setattr(self, '_home_yards_lost_from_sacks', home_stats['Sacks/Yards'].split('/')[1]) #todo-check this is correct
-        #todo- net pass yards?
+        setattr(self, '_home_times_sacked', home_stats['Sacks/Yards'].split('/')[0])  # todo-check this is correct
+        setattr(self, '_home_yards_lost_from_sacks',
+                home_stats['Sacks/Yards'].split('/')[1])  # todo-check this is correct
+        # todo- net pass yards?
         setattr(self, '_home_fumbles_lost', home_stats['Fumbles Lost'])
         setattr(self, '_home_turnovers', home_stats['Turnovers'])
-        setattr(self, '_home_penalty_yards', home_stats['Penalty Yards']) #yards from penalties?
+        setattr(self, '_home_penalty_yards', home_stats['Penalty Yards'])  # yards from penalties?
         setattr(self, '_home_total_yards', home_stats['Total Net Yards'])
         setattr(self, '_home_third_down_conversions', home_stats['Third Down'].split()[0].split('/')[0])
         setattr(self, '_home_third_down_attempts', home_stats['Third Down'].split()[0].split('/')[1])
@@ -207,6 +209,7 @@ class Games:
     id : int
         XFL game ID.
     """
+
     def __init__(self, **kwargs):
         self._games = []
 

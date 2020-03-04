@@ -1,9 +1,9 @@
 import pandas as pd
 import requests
+from ..constants import VERIFY_REQUESTS
+from .util import get_dates_by_season
 from datetime import datetime, timedelta
 from dateutil import tz
-from ..constants import VERIFY_REQUESTS
-from util import get_dates_by_season
 
 
 class Game:
@@ -17,7 +17,7 @@ class Game:
     ----------
     game_data : string
         The row containing the specified game information.
-        
+
     year : string
         The year of the current season.
     """
@@ -61,9 +61,9 @@ class Game:
         fields_to_include = {
             'MlbGameId': self._mlb_game_id,
             'Season': self._season,
-            'GameDateTime': self._game_date_time,
             'GameDate': self._game_date,
-            'GameTime': self._game_time,
+            'GameDateTime': self._game_date_time,
+            # 'GameTime': self._game_time,
             'AwayTeamId': self._away_team_id,
             'HomeTeamId': self._home_team_id,
             'MlbVenueId': self._mlb_venue_id,

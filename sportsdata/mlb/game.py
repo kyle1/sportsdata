@@ -1,7 +1,7 @@
-import mlb.util
 import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
+from .util import get_dates_by_season
 from datetime import datetime, timedelta
 from dateutil import tz
 
@@ -100,14 +100,11 @@ class Games:
         self._games = []
 
         if 'season' in kwargs:
-            season = kwargs['season']
-            start_date, end_date = mlb.util.get_dates_by_season(season)
+            start_date, end_date = get_dates_by_season(kwargs['season'])
         elif 'range' in kwargs:
-            start_date = kwargs['range'][0]
-            end_date = kwargs['range'][1]
+            start_date, end_date = kwargs['range'][0], kwargs['range'][1]
         elif 'date' in kwargs:
-            start_date = kwargs['date']
-            end_date = kwargs['date']
+            start_date, end_date = kwargs['date'], kwargs['date']
         else:
             print('Invalid Game param(s)')
             return

@@ -8,7 +8,6 @@ from sportsdata.xfl.scoring import ScoringPlays
 # player_boxscores_df.to_csv('xfl_player_boxscores.csv')
 
 
-
 games = Games(week=1)
 games_df = games.dataframes
 games_df.to_csv('xfl_games.csv')

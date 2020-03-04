@@ -253,8 +253,10 @@ class Boxscores:
             wd.get(url)
             sleep(12)
 
-            away_team = wd.find_elements_by_xpath('//div[contains(@class, "visitStroke")]')[0].get_attribute('class').split(' ')[1][4:]
-            home_team = wd.find_elements_by_xpath('//div[contains(@class, "homeStroke")]')[0].get_attribute('class').split(' ')[1][4:]
+            away_team = wd.find_elements_by_xpath(
+                '//div[contains(@class, "visitStroke")]')[0].get_attribute('class').split(' ')[1][4:]
+            home_team = wd.find_elements_by_xpath(
+                '//div[contains(@class, "homeStroke")]')[0].get_attribute('class').split(' ')[1][4:]
             away_score = wd.find_elements_by_xpath('//h2[@class = "score visitor"]')[0].text
             home_score = wd.find_elements_by_xpath('//h2[@class = "score home"]')[0].text
 

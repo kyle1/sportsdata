@@ -16,6 +16,7 @@ class Play:
     play_json : dict
         Dict that contains play information.
     """
+
     def __init__(self, game_id, play_json):
         self._mlb_game_id = None
         self._result_type = None
@@ -66,7 +67,6 @@ class Play:
         setattr(self, '_pitch_hand', play['matchup']['pitchHand']['code'])
         setattr(self, '_men_on_base', play['matchup']['splits']['menOnBase'])
 
-
     @property
     def dataframe(self):
         fields_to_include = {
@@ -109,7 +109,8 @@ class PlayByPlay:
         return iter(self.__repr__())
 
     def _get_play_by_play(self, game_id):
-        pbp_json = requests.get(f'https://statsapi.mlb.com/api/v1/game/{game_id}/playByPlay', verify=VERIFY_REQUESTS).json()
+        pbp_json = requests.get(
+            f'https://statsapi.mlb.com/api/v1/game/{game_id}/playByPlay', verify=VERIFY_REQUESTS).json()
         for play_json in pbp_json['allPlays']:
             play = Play(game_id, play_json)
             self._plays.append(play)
