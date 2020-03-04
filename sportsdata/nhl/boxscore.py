@@ -78,10 +78,8 @@ class PlayerBoxscore:
             game, team, box_json, shootout_goals, goalies_recorded)
 
     def _get_boxscore_from_json(self, game, team, box, shootout_goals, goalies_recorded):
-        has_skater_stats = 'skaterStats' in box['stats'] and len(
-            skater_stats) > 0
-        has_goalie_stats = 'goalieStats' in box['stats'] and len(
-            goalie_stats) > 0
+        has_skater_stats = 'skaterStats' in box['stats'] and len(box['stats']['skaterStats']) > 0
+        has_goalie_stats = 'goalieStats' in box['stats'] and len(box['stats']['goalieStats']) > 0
         if not has_skater_stats and not has_goalie_stats:
             return
 
