@@ -97,7 +97,7 @@ class PlayerBoxscore:
         setattr(self, '_shootout', game._shootout)
 
         if has_skater_stats:
-            skater_stats = skater_stats
+            skater_stats = box['stats']['skaterStats']
             setattr(self, '_skater_time_on_ice', skater_stats['timeOnIce'])
             setattr(self, '_skater_assists', skater_stats['assists'])
             setattr(self, '_skater_goals', skater_stats['goals'])
