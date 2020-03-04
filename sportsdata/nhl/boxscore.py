@@ -79,9 +79,9 @@ class PlayerBoxscore:
 
     def _get_boxscore_from_json(self, game, team, box, shootout_goals, goalies_recorded):
         has_skater_stats = 'skaterStats' in box['stats'] and len(
-            box['stats']['skaterStats']) > 0
+            skater_stats) > 0
         has_goalie_stats = 'goalieStats' in box['stats'] and len(
-            box['stats']['goalieStats']) > 0
+            goalie_stats) > 0
         if not has_skater_stats and not has_goalie_stats:
             return
 
@@ -97,81 +97,50 @@ class PlayerBoxscore:
         setattr(self, '_shootout', game._shootout)
 
         if has_skater_stats:
-            setattr(self, '_skater_time_on_ice',
-                    box['stats']['skaterStats']['timeOnIce'])
-            setattr(self, '_skater_assists',
-                    box['stats']['skaterStats']['assists'])
-            setattr(self, '_skater_goals',
-                    box['stats']['skaterStats']['goals'])
-            setattr(self, '_skater_shots',
-                    box['stats']['skaterStats']['shots'])
-            setattr(self, '_skater_hits', box['stats']['skaterStats']['hits'])
-            setattr(self, '_skater_power_play_goals',
-                    box['stats']['skaterStats']['powerPlayGoals'])
-            setattr(self, '_skater_power_play_assists',
-                    box['stats']['skaterStats']['powerPlayAssists'])
-            if 'penaltyMinutes' in box['stats']['skaterStats']:
-                setattr(self, '_skater_penalty_mins',
-                        box['stats']['skaterStats']['penaltyMinutes'])
-            setattr(self, '_skater_takeaways',
-                    box['stats']['skaterStats']['takeaways'])
-            setattr(self, '_skater_giveaways',
-                    box['stats']['skaterStats']['giveaways'])
-            setattr(self, '_skater_short_handed_goals',
-                    box['stats']['skaterStats']['shortHandedGoals'])
-            setattr(self, '_skater_short_handed_assists',
-                    box['stats']['skaterStats']['shortHandedAssists'])
-            setattr(self, '_skater_blocked',
-                    box['stats']['skaterStats']['blocked'])
-            setattr(self, '_skater_plus_minus',
-                    box['stats']['skaterStats']['plusMinus'])
-            setattr(self, '_skater_even_time_on_ice',
-                    box['stats']['skaterStats']['evenTimeOnIce'])
-            setattr(self, '_skater_power_play_time_on_ice',
-                    box['stats']['skaterStats']['powerPlayTimeOnIce'])
-            setattr(self, '_skater_short_handed_time_on_ice',
-                    box['stats']['skaterStats']['shortHandedTimeOnIce'])
-            setattr(self, '_skater_shootout_goals',
-                    self._get_player_shootout_goals(game, box, shootout_goals))
+            skater_stats = skater_stats
+            setattr(self, '_skater_time_on_ice', skater_stats['timeOnIce'])
+            setattr(self, '_skater_assists', skater_stats['assists'])
+            setattr(self, '_skater_goals', skater_stats['goals'])
+            setattr(self, '_skater_shots', skater_stats['shots'])
+            setattr(self, '_skater_hits', skater_stats['hits'])
+            setattr(self, '_skater_power_play_goals', skater_stats['powerPlayGoals'])
+            setattr(self, '_skater_power_play_assists', skater_stats['powerPlayAssists'])
+            if 'penaltyMinutes' in skater_stats:
+                setattr(self, '_skater_penalty_mins', skater_stats['penaltyMinutes'])
+            setattr(self, '_skater_takeaways', skater_stats['takeaways'])
+            setattr(self, '_skater_giveaways', skater_stats['giveaways'])
+            setattr(self, '_skater_short_handed_goals', skater_stats['shortHandedGoals'])
+            setattr(self, '_skater_short_handed_assists', skater_stats['shortHandedAssists'])
+            setattr(self, '_skater_blocked', skater_stats['blocked'])
+            setattr(self, '_skater_plus_minus',skater_stats['plusMinus'])
+            setattr(self, '_skater_even_time_on_ice', skater_stats['evenTimeOnIce'])
+            setattr(self, '_skater_power_play_time_on_ice', skater_stats['powerPlayTimeOnIce'])
+            setattr(self, '_skater_short_handed_time_on_ice', skater_stats['shortHandedTimeOnIce'])
+            setattr(self, '_skater_shootout_goals', self._get_player_shootout_goals(game, box, shootout_goals))
 
         if has_goalie_stats:
-            setattr(self, '_goalie_time_on_ice',
-                    box['stats']['goalieStats']['timeOnIce'])
-            setattr(self, '_goalie_assists',
-                    box['stats']['goalieStats']['assists'])
-            setattr(self, '_goalie_goals',
-                    box['stats']['goalieStats']['goals'])
-            setattr(self, '_goalie_pim', box['stats']['goalieStats']['pim'])
-            setattr(self, '_goalie_shots_against',
-                    box['stats']['goalieStats']['shots'])
-            setattr(self, '_goalie_saves',
-                    box['stats']['goalieStats']['saves'])
-            setattr(self, '_goalie_goals_against',
-                    box['stats']['goalieStats']['shots'] - box['stats']['goalieStats']['saves'])
-            setattr(self, '_goalie_power_play_saves',
-                    box['stats']['goalieStats']['powerPlaySaves'])
-            setattr(self, '_goalie_short_handed_saves',
-                    box['stats']['goalieStats']['shortHandedSaves'])
-            setattr(self, '_goalie_even_saves',
-                    box['stats']['goalieStats']['evenSaves'])
-            setattr(self, '_goalie_short_handed_shots_against',
-                    box['stats']['goalieStats']['shortHandedShotsAgainst'])
-            setattr(self, '_goalie_even_shots_against',
-                    box['stats']['goalieStats']['evenShotsAgainst'])
-            setattr(self, '_goalie_power_play_shots_against',
-                    box['stats']['goalieStats']['powerPlayShotsAgainst'])
-            if 'decision' in box['stats']['goalieStats']:
-                setattr(self, '_goalie_decision',
-                        box['stats']['goalieStats']['decision'])
-            if 'savePercentage' in box['stats']['goalieStats']:
-                setattr(self, '_goalie_save_pct',
-                        box['stats']['goalieStats']['savePercentage'])
-            if 'powerPlaySavePercentage' in box['stats']['goalieStats']:
-                setattr(self, '_goalie_power_play_save_pct',
-                        box['stats']['goalieStats']['powerPlaySavePercentage'])
-            if 'evenStrengthSavePercentage' in box['stats']['goalieStats']:
-                setattr(self, '_goalie_even_strength_save_pct',
-                        box['stats']['goalieStats']['evenStrengthSavePercentage'])
+            goalie_stats = box['stats']['goalieStats']
+            setattr(self, '_goalie_time_on_ice', goalie_stats['timeOnIce'])
+            setattr(self, '_goalie_assists', goalie_stats['assists'])
+            setattr(self, '_goalie_goals', goalie_stats['goals'])
+            setattr(self, '_goalie_pim', goalie_stats['pim'])
+            setattr(self, '_goalie_shots_against', goalie_stats['shots'])
+            setattr(self, '_goalie_saves', goalie_stats['saves'])
+            setattr(self, '_goalie_goals_against', goalie_stats['shots'] - goalie_stats['saves'])
+            setattr(self, '_goalie_power_play_saves', goalie_stats['powerPlaySaves'])
+            setattr(self, '_goalie_short_handed_saves', goalie_stats['shortHandedSaves'])
+            setattr(self, '_goalie_even_saves', goalie_stats['evenSaves'])
+            setattr(self, '_goalie_short_handed_shots_against', goalie_stats['shortHandedShotsAgainst'])
+            setattr(self, '_goalie_even_shots_against', goalie_stats['evenShotsAgainst'])
+            setattr(self, '_goalie_power_play_shots_against', goalie_stats['powerPlayShotsAgainst'])
+            if 'decision' in goalie_stats:
+                setattr(self, '_goalie_decision', goalie_stats['decision'])
+            if 'savePercentage' in goalie_stats:
+                setattr(self, '_goalie_save_pct', goalie_stats['savePercentage'])
+            if 'powerPlaySavePercentage' in goalie_stats:
+                setattr(self, '_goalie_power_play_save_pct', goalie_stats['powerPlaySavePercentage'])
+            if 'evenStrengthSavePercentage' in goalie_stats:
+                setattr(self, '_goalie_even_strength_save_pct', goalie_stats['evenStrengthSavePercentage'])
             setattr(self, '_only_goalie', goalies_recorded == 1)
 
     def _get_team_result(self, game, team):
@@ -379,6 +348,10 @@ class GameBoxscore:
         # has_shootout = game['linescore']['hasShootout']
         # if has_shootout:
         #     result_note = "SO"  # Override "OT" note
+
+        away_team_stats = game['teams']['away']['teamStats']['teamSkaterStats']
+        home_team_stats = game['teams']['home']['teamStats']['teamSkaterStats']
+
         setattr(self, '_nhl_game_id', game_id)
         #setattr(self, '_season', int(game['season'][:4])),
         #setattr(self, '_game_date_time', game_dt.isoformat())
@@ -386,29 +359,29 @@ class GameBoxscore:
         #setattr(self, '_game_time', game_dt.time().isoformat())
         #setattr(self, '_game_status', game['status']['detailedState'])
         setattr(self, '_away_team_id', game['teams']['away']['team']['id'])
-        setattr(self, '_away_goals', game['teams']['away']['teamStats']['teamSkaterStats']['goals'])
-        setattr(self, '_away_pim', game['teams']['away']['teamStats']['teamSkaterStats']['pim'])
-        setattr(self, '_away_shots', game['teams']['away']['teamStats']['teamSkaterStats']['shots'])
-        setattr(self, '_away_pp_pct', game['teams']['away']['teamStats']['teamSkaterStats']['powerPlayPercentage'])
-        setattr(self, '_away_pp_goals', game['teams']['away']['teamStats']['teamSkaterStats']['powerPlayGoals'])
-        setattr(self, '_away_pp_opportunities', game['teams']['away']['teamStats']['teamSkaterStats']['powerPlayOpportunities'])
-        setattr(self, '_away_face_off_win_pct', game['teams']['away']['teamStats']['teamSkaterStats']['faceOffWinPercentage'])
-        setattr(self, '_away_blocked', game['teams']['away']['teamStats']['teamSkaterStats']['blocked'])
-        setattr(self, '_away_takeaways', game['teams']['away']['teamStats']['teamSkaterStats']['takeaways'])
-        setattr(self, '_away_giveaways', game['teams']['away']['teamStats']['teamSkaterStats']['giveaways'])
-        setattr(self, '_away_hits', game['teams']['away']['teamStats']['teamSkaterStats']['hits'])
+        setattr(self, '_away_goals', away_team_stats['goals'])
+        setattr(self, '_away_pim', away_team_stats['pim'])
+        setattr(self, '_away_shots', away_team_stats['shots'])
+        setattr(self, '_away_pp_pct', away_team_stats['powerPlayPercentage'])
+        setattr(self, '_away_pp_goals', away_team_stats['powerPlayGoals'])
+        setattr(self, '_away_pp_opportunities', away_team_stats['powerPlayOpportunities'])
+        setattr(self, '_away_face_off_win_pct', away_team_stats['faceOffWinPercentage'])
+        setattr(self, '_away_blocked', away_team_stats['blocked'])
+        setattr(self, '_away_takeaways', away_team_stats['takeaways'])
+        setattr(self, '_away_giveaways', away_team_stats['giveaways'])
+        setattr(self, '_away_hits', away_team_stats['hits'])
         setattr(self, '_home_team_id', game['teams']['home']['team']['id'])
-        setattr(self, '_home_goals', game['teams']['home']['teamStats']['teamSkaterStats']['goals'])
-        setattr(self, '_home_pim', game['teams']['home']['teamStats']['teamSkaterStats']['pim'])
-        setattr(self, '_home_shots', game['teams']['home']['teamStats']['teamSkaterStats']['shots'])
-        setattr(self, '_home_pp_pct', game['teams']['home']['teamStats']['teamSkaterStats']['powerPlayPercentage'])
-        setattr(self, '_home_pp_goals', game['teams']['home']['teamStats']['teamSkaterStats']['powerPlayGoals'])
-        setattr(self, '_home_pp_opportunities', game['teams']['home']['teamStats']['teamSkaterStats']['powerPlayOpportunities'])
-        setattr(self, '_home_face_off_win_pct', game['teams']['home']['teamStats']['teamSkaterStats']['faceOffWinPercentage'])
-        setattr(self, '_home_blocked', game['teams']['home']['teamStats']['teamSkaterStats']['blocked'])
-        setattr(self, '_home_takeaways', game['teams']['home']['teamStats']['teamSkaterStats']['takeaways'])
-        setattr(self, '_home_giveaways', game['teams']['home']['teamStats']['teamSkaterStats']['giveaways'])
-        setattr(self, '_home_hits', game['teams']['home']['teamStats']['teamSkaterStats']['hits'])
+        setattr(self, '_home_goals', home_team_stats['goals'])
+        setattr(self, '_home_pim', home_team_stats['pim'])
+        setattr(self, '_home_shots', home_team_stats['shots'])
+        setattr(self, '_home_pp_pct', home_team_stats['powerPlayPercentage'])
+        setattr(self, '_home_pp_goals', home_team_stats['powerPlayGoals'])
+        setattr(self, '_home_pp_opportunities', home_team_stats['powerPlayOpportunities'])
+        setattr(self, '_home_face_off_win_pct', home_team_stats['faceOffWinPercentage'])
+        setattr(self, '_home_blocked', home_team_stats['blocked'])
+        setattr(self, '_home_takeaways', home_team_stats['takeaways'])
+        setattr(self, '_home_giveaways', home_team_stats['giveaways'])
+        setattr(self, '_home_hits', home_team_stats['hits'])
         #setattr(self, '_nhl_venue_id', None if 'id' not in game['venue'] else game['venue']['id'])
         #setattr(self, '_nhl_venue_name', game['venue']['name'])
         #setattr(self, '_result_note', result_note)
