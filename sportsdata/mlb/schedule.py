@@ -15,14 +15,14 @@ class Game:
 
     Parameters
     ----------
-    game_data : string
-        The row containing the specified game information.
+    game_json : string
+        Dict containing game information
 
     year : string
         The year of the current season.
     """
 
-    def __init__(self, game_data):
+    def __init__(self, game_json):
         self._mlb_game_id = None
         self._season = None
         self._game_date = None
@@ -35,15 +35,13 @@ class Game:
         self._series_game_number = None
         self._games_in_series = None
 
-        self._set_game(game_data)  # todo ??
+        self._parse_game(game_json)
 
-    def _set_game(self, game):
+    def _parse_game(self, game):
+        utc = datetime.strptime(game['gameDate'], '%Y-%m-%dT%H:%M:%SZ')
         from_zone = tz.gettz('UTC')
         to_zone = tz.gettz('America/Los_Angeles')
-        utc = datetime.strptime(game['gameDate'], '%Y-%m-%dT%H:%M:%SZ')
-        utc = utc.replace(tzinfo=from_zone)
-        pst = utc.astimezone(to_zone)
-        game_dt = pst.replace(tzinfo=None)
+        game_dt = utc.replace(tzinfo=from_zone).astimezone(to_zone).replace(tzinfo=None)
         setattr(self, '_mlb_game_id', game['gamePk'])
         setattr(self, '_season', game['seasonDisplay'])
         setattr(self, '_game_date', game_dt.date().isoformat())
@@ -119,8 +117,8 @@ class Schedule:
         print('Getting schedule from ' + url)
         games = requests.get(url, verify=VERIFY_REQUESTS).json()
         for date in games['dates']:
-            for game_data in date['games']:
-                game = Game(game_data)
+            for game_json in date['games']:
+                game = Game(game_json)
                 self._games.append(game)
 
     @property

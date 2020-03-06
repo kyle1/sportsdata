@@ -21,12 +21,10 @@ class Match:
         self._set_match(match_json)
 
     def _set_match(self, match):
+        utc = datetime.strptime(match['matchDate'], '%Y-%m-%dT%H:%M:%SZ')
         from_zone = tz.gettz('UTC')
         to_zone = tz.gettz('America/Los_Angeles')
-        utc = datetime.strptime(match['matchDate'], '%Y-%m-%dT%H:%M:%SZ')
-        utc = utc.replace(tzinfo=from_zone)
-        pst = utc.astimezone(to_zone)
-        match_dt = pst.replace(tzinfo=None)
+        match_dt = utc.replace(tzinfo=from_zone).astimezone(to_zone).replace(tzinfo=None)
         setattr(self, '_ten_match_id', match['matchPk'])
         setattr(self, '_match_date_time', match_dt.isoformat())
         setattr(self, '_match_date', match_dt.date().isoformat())

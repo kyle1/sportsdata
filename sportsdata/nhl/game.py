@@ -29,12 +29,10 @@ class Game:
         self._create_game(game_data)
 
     def _create_game(self, game):
+        utc = datetime.strptime(game['gameDate'], '%Y-%m-%dT%H:%M:%SZ')
         from_zone = tz.gettz('UTC')
         to_zone = tz.gettz('America/Los_Angeles')
-        utc = datetime.strptime(game['gameDate'], '%Y-%m-%dT%H:%M:%SZ')
-        utc = utc.replace(tzinfo=from_zone)
-        pst = utc.astimezone(to_zone)
-        game_dt = pst.replace(tzinfo=None)
+        game_dt = utc.replace(tzinfo=from_zone).astimezone(to_zone).replace(tzinfo=None)
         has_overtime = False
         result_note = ''
         for period in game['linescore']['periods']:

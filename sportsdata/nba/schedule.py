@@ -19,18 +19,15 @@ class Game:
         self._nba_venue_id = None
         self._nba_venue_name = None
 
-        self._set_game(game_data, season)
+        self._parse_game(game_data, season)
 
-    def _set_game(self, game, season):
-        from_zone = tz.gettz('UTC')
-        to_zone = tz.gettz('America/Los_Angeles')
-        est = datetime.strptime(game['etm'], '%Y-%m-%dT%H:%M:%S')
-        dt = est + timedelta(hours=-3)
+    def _parse_game(self, game, season):
+        game_dt = datetime.strptime(game['etm'], '%Y-%m-%dT%H:%M:%S') + timedelta(hours=-3) # EST
         setattr(self, '_nba_game_id', game['gid'])
         setattr(self, '_season', season)
-        setattr(self, '_game_date_time', dt.isoformat())
-        setattr(self, '_game_date', dt.date().isoformat())
-        setattr(self, '_game_time', dt.time().isoformat())
+        setattr(self, '_game_date_time', game_dt.isoformat())
+        setattr(self, '_game_date', game_dt.date().isoformat())
+        setattr(self, '_game_time', game_dt.time().isoformat())
         setattr(self, '_away_team_id', game['v']['tid'])
         setattr(self, '_home_team_id', game['h']['tid'])
         #setattr(self, '_nba_venue_id', None if 'id' not in game['venue'] else game['venue']['id'])

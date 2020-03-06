@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
 from .playbyplay import PlayByPlay
+from .schedule import Schedule
 from .util import get_dates_by_season
 from datetime import datetime, timedelta
 from dateutil import tz
@@ -14,8 +15,8 @@ class PlayerBoxscore:
 
     Parameters
     ----------
-    game : dict
-        Dict that contains the game data.
+    game : GameBoxscore
+        Object that contains game boxscore data.
 
     team : string
         'away' or 'home'
@@ -197,8 +198,14 @@ class PlayerBoxscores:
 
     Parameters
     ----------
-    games : list
-        List of games to retrieve boxscores for.
+    game : GameBoxscore
+        Object that contains game boxscore data.
+
+    team : string
+        'away' or 'home'
+
+    players_json : list
+        List of dicts that contains the players' boxscore data.
     """
 
     def __init__(self, game, team, players_json):
@@ -235,7 +242,7 @@ class GameBoxscore:
     Parameters
     ----------
     game_id : int
-        A game ID according to MLB's API.
+        The game ID according to MLB's API.
     """
 
     def __init__(self, game_id):
@@ -300,6 +307,10 @@ class GameBoxscore:
         self._get_game_boxscore(game_id)
 
     def _get_game_boxscore(self, game_id):
+        #todo:
+        #get schedule data from https://statsapi.mlb.com/api/v1/game/565895/feed/live ??
+
+
         # from_zone = tz.gettz('UTC')
         # to_zone = tz.gettz('America/Los_Angeles')
         # utc = datetime.strptime(game['gameDate'], '%Y-%m-%dT%H:%M:%SZ')
@@ -449,7 +460,7 @@ class GameBoxscores:
     """
     Game stats for multiple games.
 
-    Parameters
+    Parameters (kwargs)
     ----------
     season : int
         Season (year) to get game boxscores from.

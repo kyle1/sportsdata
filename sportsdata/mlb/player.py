@@ -5,7 +5,7 @@ from ..constants import VERIFY_REQUESTS
 
 class Player:
     """
-    Get MLB player.
+    MLB player.
 
     Parameters
     ----------
@@ -30,9 +30,9 @@ class Player:
         self._bat_side = None
         self._pitch_hand = None
 
-        self._set_player(player_data, season)
+        self._parse_player(player_data, season)
 
-    def _set_player(self, player, season):
+    def _parse_player(self, player, season):
         setattr(self, '_mlb_player_id', player['id'])
         setattr(self, '_season', season)
         setattr(self, '_full_name', player['fullName'])
