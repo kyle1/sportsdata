@@ -26,5 +26,10 @@ from sportsdata.mlb.team import Team, Teams
 # teams_df.to_csv('mlb_teams.csv')
 
 
-schedule = Schedule(season=2019)
-print(schedule.dataframes)
+# schedule = Schedule(season=2019)
+# print(schedule.dataframes)
+
+box = GameBoxscore(565895)
+box_df = box.dataframe
+print(box_df)
+box_df.to_csv('box.csv')

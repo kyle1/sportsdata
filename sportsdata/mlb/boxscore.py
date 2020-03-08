@@ -249,8 +249,14 @@ class GameBoxscore:
         self._mlb_game_id = None
         self._season = None
         self._game_date_time = None
+        self._game_date = None
+        self._game_time = None
+        self._day_night = None
         self._game_status = None
         self._away_team_id = None
+        self._away_record_wins = None
+        self._away_record_losses = None
+        self._away_record_pct = None
         self._away_runs = None
         self._away_fly_outs = None
         self._away_ground_outs = None
@@ -267,6 +273,9 @@ class GameBoxscore:
         self._away_stolen_bases = None
         self._away_left_on_base = None
         self._home_team_id = None
+        self._home_record_wins = None
+        self._home_record_losses = None
+        self._home_record_pct = None
         self._home_runs = None
         self._home_fly_outs = None
         self._home_ground_outs = None
@@ -289,16 +298,7 @@ class GameBoxscore:
         self._away_players = None
         self._home_players = None
         self._play_by_play = None
-        # self._away_team_record_wins = None
-        # self._away_team_record_losses = None
-        # self._away_team_record_pct = None
-        # self._home_team_id = None
-        # self._home_team_score = None
-        # self._home_team_record_wins = None
-        # self._home_team_record_losses = None
-        # self._home_team_record_pct = None
         # self._mlb_venue_id = None
-        # self._day_night = None
         # self._series_description = None
         # self._series_game_number = None
         # self._games_in_series = None
@@ -307,84 +307,81 @@ class GameBoxscore:
         self._get_game_boxscore(game_id)
 
     def _get_game_boxscore(self, game_id):
-        #todo:
-        #get schedule data from https://statsapi.mlb.com/api/v1/game/565895/feed/live ??
+        setattr(self, '_mlb_game_id', game_id)
 
+        url = f'https://statsapi.mlb.com/api/v1/game/{game_id}/feed/live'
+        print(f'getting game data from {url}')
+        game = requests.get(url, verify=VERIFY_REQUESTS).json()
+        utc = datetime.strptime(game['gameData']['datetime']['dateTime'], '%Y-%m-%dT%H:%M:%SZ')
+        from_zone = tz.gettz('UTC')
+        to_zone = tz.gettz('America/Los_Angeles')
+        game_dt = utc.replace(tzinfo=from_zone).astimezone(to_zone).replace(tzinfo=None)
+        setattr(self, '_season', game['gameData']['game']['season'])
+        setattr(self, '_game_date_time', game_dt.isoformat())
+        setattr(self, '_game_date', game_dt.date().isoformat())
+        setattr(self, '_game_time', game_dt.time().isoformat())
+        setattr(self, '_day_night', game['gameData']['datetime']['dayNight'])
+        setattr(self, '_game_status', game['gameData']['status']['detailedState'])
 
-        # from_zone = tz.gettz('UTC')
-        # to_zone = tz.gettz('America/Los_Angeles')
-        # utc = datetime.strptime(game['gameDate'], '%Y-%m-%dT%H:%M:%SZ')
-        # utc = utc.replace(tzinfo=from_zone)
-        # pst = utc.astimezone(to_zone)
-        # game_dt = pst.replace(tzinfo=None)
         url = f'https://statsapi.mlb.com/api/v1/game/{game_id}/boxscore'
         print(f'getting game boxscore data from {url}')
-        game = requests.get(url, verify=VERIFY_REQUESTS).json()
+        box = requests.get(url, verify=VERIFY_REQUESTS).json()
+        away_team = box['teams']['away']['team']
+        away_team_stats = box['teams']['away']['teamStats']
+        home_team = box['teams']['away']['team']
+        home_team_stats = box['teams']['home']['teamStats']
+        setattr(self, '_away_team_id', away_team['id'])
+        setattr(self, '_away_record_wins', away_team['record']['leagueRecord']['wins'])
+        setattr(self, '_away_record_losses', away_team['record']['leagueRecord']['losses'])
+        setattr(self, '_away_record_pct', away_team['record']['leagueRecord']['pct'])
+        setattr(self, '_away_runs', away_team_stats['batting']['runs'])
+        setattr(self, '_away_fly_outs', away_team_stats['batting']['flyOuts'])
+        setattr(self, '_away_ground_outs', away_team_stats['batting']['groundOuts'])
+        setattr(self, '_away_doubles', away_team_stats['batting']['doubles'])
+        setattr(self, '_away_triples', away_team_stats['batting']['triples'])
+        setattr(self, '_away_home_runs', away_team_stats['batting']['homeRuns'])
+        setattr(self, '_away_strikeouts', away_team_stats['batting']['strikeOuts'])
+        setattr(self, '_away_base_on_balls', away_team_stats['batting']['baseOnBalls'])
+        setattr(self, '_away_intentional_base_on_balls', away_team_stats['batting']['intentionalWalks'])
+        setattr(self, '_away_hits', away_team_stats['batting']['hits'])
+        setattr(self, '_away_hit_by_pitch', away_team_stats['batting']['hitByPitch'])
+        setattr(self, '_away_at_bats', away_team_stats['batting']['atBats'])
+        setattr(self, '_away_caught_stealing', away_team_stats['batting']['caughtStealing'])
+        setattr(self, '_away_stolen_bases', away_team_stats['batting']['stolenBases'])
+        setattr(self, '_away_left_on_base', away_team_stats['batting']['leftOnBase'])
+        setattr(self, '_home_team_id', box['teams']['home']['team']['id'])
+        setattr(self, '_home_record_wins', home_team['record']['leagueRecord']['wins'])
+        setattr(self, '_home_record_losses', home_team['record']['leagueRecord']['losses'])
+        setattr(self, '_home_record_pct', home_team['record']['leagueRecord']['pct'])
+        setattr(self, '_home_runs', home_team_stats['batting']['runs'])
+        setattr(self, '_home_fly_outs', home_team_stats['batting']['flyOuts'])
+        setattr(self, '_home_ground_outs', home_team_stats['batting']['groundOuts'])
+        setattr(self, '_home_doubles', home_team_stats['batting']['doubles'])
+        setattr(self, '_home_triples', home_team_stats['batting']['triples'])
+        setattr(self, '_home_home_runs', home_team_stats['batting']['homeRuns'])
+        setattr(self, '_home_strikeouts', home_team_stats['batting']['strikeOuts'])
+        setattr(self, '_home_base_on_balls', home_team_stats['batting']['baseOnBalls'])
+        setattr(self, '_home_intentional_base_on_balls', home_team_stats['batting']['intentionalWalks'])
+        setattr(self, '_home_hits', home_team_stats['batting']['hits'])
+        setattr(self, '_home_hit_by_pitch', home_team_stats['batting']['hitByPitch'])
+        setattr(self, '_home_at_bats', home_team_stats['batting']['atBats'])
+        setattr(self, '_home_caught_stealing', home_team_stats['batting']['caughtStealing'])
+        setattr(self, '_home_stolen_bases', home_team_stats['batting']['stolenBases'])
+        setattr(self, '_home_left_on_base', home_team_stats['batting']['leftOnBase'])
 
-        setattr(self, '_mlb_game_id', game_id)
-        # setattr(self, '_season', game['seasonDisplay'])
-        # setattr(self, '_game_date_time', game_dt.isoformat())
-        # setattr(self, '_game_date', game_dt.date().isoformat())
-        # setattr(self, '_game_time', game_dt.time().isoformat())
-        #setattr(self, '_game_status', game['status']['detailedState'])
-        setattr(self, '_away_team_id', game['teams']['away']['team']['id'])
-        setattr(self, '_away_runs', game['teams']['away']['teamStats']['batting']['runs'])
-        setattr(self, '_away_fly_outs', game['teams']['away']['teamStats']['batting']['flyOuts'])
-        setattr(self, '_away_ground_outs', game['teams']['away']['teamStats']['batting']['groundOuts'])
-        setattr(self, '_away_doubles', game['teams']['away']['teamStats']['batting']['doubles'])
-        setattr(self, '_away_triples', game['teams']['away']['teamStats']['batting']['triples'])
-        setattr(self, '_away_home_runs', game['teams']['away']['teamStats']['batting']['homeRuns'])
-        setattr(self, '_away_strikeouts', game['teams']['away']['teamStats']['batting']['strikeOuts'])
-        setattr(self, '_away_base_on_balls', game['teams']['away']['teamStats']['batting']['baseOnBalls'])
-        setattr(self, '_away_intentional_base_on_balls', game['teams']
-                ['away']['teamStats']['batting']['intentionalWalks'])
-        setattr(self, '_away_hits', game['teams']['away']['teamStats']['batting']['hits'])
-        setattr(self, '_away_hit_by_pitch', game['teams']['away']['teamStats']['batting']['hitByPitch'])
-        setattr(self, '_away_at_bats', game['teams']['away']['teamStats']['batting']['atBats'])
-        setattr(self, '_away_caught_stealing', game['teams']['away']['teamStats']['batting']['caughtStealing'])
-        setattr(self, '_away_stolen_bases', game['teams']['away']['teamStats']['batting']['stolenBases'])
-        setattr(self, '_away_left_on_base', game['teams']['away']['teamStats']['batting']['leftOnBase'])
-        setattr(self, '_home_team_id', game['teams']['home']['team']['id'])
-        setattr(self, '_home_runs', game['teams']['home']['teamStats']['batting']['runs'])
-        setattr(self, '_home_fly_outs', game['teams']['home']['teamStats']['batting']['flyOuts'])
-        setattr(self, '_home_ground_outs', game['teams']['home']['teamStats']['batting']['groundOuts'])
-        setattr(self, '_home_doubles', game['teams']['home']['teamStats']['batting']['doubles'])
-        setattr(self, '_home_triples', game['teams']['home']['teamStats']['batting']['triples'])
-        setattr(self, '_home_home_runs', game['teams']['home']['teamStats']['batting']['homeRuns'])
-        setattr(self, '_home_strikeouts', game['teams']['home']['teamStats']['batting']['strikeOuts'])
-        setattr(self, '_home_base_on_balls', game['teams']['home']['teamStats']['batting']['baseOnBalls'])
-        setattr(self, '_home_intentional_base_on_balls', game['teams']
-                ['home']['teamStats']['batting']['intentionalWalks'])
-        setattr(self, '_home_hits', game['teams']['home']['teamStats']['batting']['hits'])
-        setattr(self, '_home_hit_by_pitch', game['teams']['home']['teamStats']['batting']['hitByPitch'])
-        setattr(self, '_home_at_bats', game['teams']['home']['teamStats']['batting']['atBats'])
-        setattr(self, '_home_caught_stealing', game['teams']['home']['teamStats']['batting']['caughtStealing'])
-        setattr(self, '_home_stolen_bases', game['teams']['home']['teamStats']['batting']['stolenBases'])
-        setattr(self, '_home_left_on_base', game['teams']['home']['teamStats']['batting']['leftOnBase'])
+        setattr(self, '_home_plate_official_id', self._get_official_id_by_type(box['officials'], 'Home Plate'))
+        setattr(self, '_first_base_official_id', self._get_official_id_by_type(box['officials'], 'First Base'))
+        setattr(self, '_second_base_official_id', self._get_official_id_by_type(box['officials'], 'Second Base'))
+        setattr(self, '_third_base_official_id', self._get_official_id_by_type(box['officials'], 'Third Base'))
 
-        setattr(self, '_home_plate_official_id', self._get_official_id_by_type(game['officials'], 'Home Plate'))
-        setattr(self, '_first_base_official_id', self._get_official_id_by_type(game['officials'], 'First Base'))
-        setattr(self, '_second_base_official_id', self._get_official_id_by_type(game['officials'], 'Second Base'))
-        setattr(self, '_third_base_official_id', self._get_official_id_by_type(game['officials'], 'Third Base'))
-
-        # setattr(self, '_away_team_score', game['teams']['away']['score'])
-        # setattr(self, '_away_team_record_wins', game['teams']['away']['leagueRecord']['wins'])
-        # setattr(self, '_away_team_record_losses', game['teams']['away']['leagueRecord']['losses'])
-        # setattr(self, '_away_team_record_pct', game['teams']['away']['leagueRecord']['pct'])
-        # setattr(self, '_home_team_id', game['teams']['home']['team']['id'])
-        # setattr(self, '_home_team_score', game['teams']['home']['score'])
-        # setattr(self, '_home_team_record_wins', game['teams']['home']['leagueRecord']['wins'])
-        # setattr(self, '_home_team_record_losses', game['teams']['home']['leagueRecord']['losses'])
-        # setattr(self, '_home_team_record_pct', game['teams']['home']['leagueRecord']['pct'])
         # setattr(self, '_mlb_venue_id', None if 'id' not in game['venue'] else game['venue']['id'])
-        # setattr(self, '_day_night', game['dayNight'])
         # setattr(self, '_series_description', game['seriesDescription'])
         # setattr(self, '_series_game_number', game['seriesGameNumber'])
         # setattr(self, '_games_in_series', game['gamesInSeries'])
         # setattr(self, '_extra_innings', 'todo')
 
-        setattr(self, '_away_players', PlayerBoxscores(self, 'away', game['teams']['away']))
-        setattr(self, '_home_players', PlayerBoxscores(self, 'home', game['teams']['home']))
+        setattr(self, '_away_players', PlayerBoxscores(self, 'away', box['teams']['away']))
+        setattr(self, '_home_players', PlayerBoxscores(self, 'home', box['teams']['home']))
         setattr(self, '_play_by_play', PlayByPlay(game_id))
 
     def _get_official_id_by_type(self, officials, official_type):
@@ -396,12 +393,16 @@ class GameBoxscore:
     def dataframe(self):
         fields_to_include = {
             'MlbGameId': self._mlb_game_id,
-            # 'Season': self._season,
-            # 'GameDateTime': self._game_date_time,
-            # 'GameDate': self._game_date,
-            # 'GameTime': self._game_time,
-            # 'GameStatus': self._game_status,
+            'Season': self._season,
+            'GameDateTime': self._game_date_time,
+            'GameDate': self._game_date,
+            'GameTime': self._game_time,
+            'DayNight': self._day_night,
+            'GameStatus': self._game_status,
             'AwayTeamId': self._away_team_id,
+            'AwayRecordWins': self._away_record_wins,
+            'AwayRecordLosses': self._away_record_losses,
+            'AwayRecordPct': self._away_record_pct,
             'AwayRuns': self._away_runs,
             'AwayFlyOuts': self._away_fly_outs,
             'AwayGroundOuts': self._away_ground_outs,
@@ -418,6 +419,9 @@ class GameBoxscore:
             'AwayStolenBases': self._away_stolen_bases,
             'AwayLeftOnBase': self._away_left_on_base,
             'HomeTeamId': self._home_team_id,
+            'HomeRecordWins': self._home_record_wins,
+            'HomeRecordLosses': self._home_record_losses,
+            'HomeRecordPct': self._home_record_pct,
             'HomeRuns': self._home_runs,
             'HomeFlyOuts': self._home_fly_outs,
             'HomeGroundOuts': self._home_ground_outs,
