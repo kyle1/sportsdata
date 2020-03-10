@@ -2,7 +2,7 @@ import pandas as pd
 
 
 class ScoringPlay:
-    def __init__(self, game_id, tr):
+    def __init__(self, game, tr):
         self._xfl_game_id = None
         self._xfl_team_abbrev = None
         self._quarter = None
@@ -17,7 +17,7 @@ class ScoringPlay:
 
         self._parse_scoring_play(game_id, tr)
 
-    def _parse_scoring_play(self, game_id, tr):
+    def _parse_scoring_play(self, game, tr):
         div = tr.find_elements_by_class_name('row.playRow.teamRow')[0]
 
         # Extract team abbreviation from the logo image src tag.
@@ -34,7 +34,7 @@ class ScoringPlay:
         end_away_score = div.find_element_by_class_name('rVisitor').get_attribute('textContent')
         end_home_score = div.find_element_by_class_name('rHome').get_attribute('textContent')
 
-        setattr(self, '_xfl_game_id', game_id)
+        setattr(self, '_xfl_game_id', game._xfl_game_id)
         setattr(self, '_xfl_team_abbrev', team_abbrev)
         setattr(self, '_quarter', quarter)
         setattr(self, '_play_start_time', start)
@@ -65,10 +65,10 @@ class ScoringPlay:
 
 
 class ScoringPlays:
-    def __init__(self, game_id, scoring_table):
+    def __init__(self, game, scoring_table):
         self._scoring_plays = []
 
-        self._get_scoring_plays(game_id, scoring_table)
+        self._get_scoring_plays(game, scoring_table)
 
     def __repr__(self):
         return self._scoring_plays
@@ -76,10 +76,10 @@ class ScoringPlays:
     def __iter__(self):
         return iter(self.__repr__())
 
-    def _get_scoring_plays(self, game_id, scoring_table):
+    def _get_scoring_plays(self, game, scoring_table):
         rows = scoring_table.find_elements_by_class_name('body')
         for tr in rows:
-            scoring_play = ScoringPlay(game_id, tr)
+            scoring_play = ScoringPlay(game, tr)
             self._scoring_plays.append(scoring_play)
 
     @property

@@ -269,7 +269,7 @@ class PlayerBoxscores:
         all_boxscores = all_boxscores + list(combined)
 
         scoring_table = wd.find_elements_by_xpath('//div[@class = "statDisplay playlistScoring scoreTable"]')[0]
-        scoring_plays = ScoringPlays(game._xfl_game_id, scoring_table)
+        scoring_plays = ScoringPlays(game, scoring_table)
 
         for box in all_boxscores:
             boxscore = PlayerBoxscore(box, scoring_plays)
@@ -435,7 +435,7 @@ class GameBoxscore:
         setattr(self, '_home_fourth_down_attempts', home_stats['Fourth Down'].split()[0].split('/')[1])
 
         setattr(self, '_boxscores', PlayerBoxscores(self, wd))
-        #setattr(self, '_scoring_plays', ScoringPlays())
+        setattr(self, '_scoring_plays', ScoringPlays(self, wd))
 
     @property
     def dataframe(self):
