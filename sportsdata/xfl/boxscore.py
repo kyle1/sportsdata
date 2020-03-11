@@ -153,7 +153,7 @@ class PlayerBoxscores:
         Object that contains game-level boxscore data.
 
     wd : Selenium WebDriver
-        The Selenium web driver used to scrape the XFL website.
+        The Selenium web driver used to scrape XFL's website.
     """
 
     def __init__(self, game, wd):
@@ -313,7 +313,7 @@ class GameBoxscore:
         The game ID according to XFL's website.
 
     wd : Selenium WebDriver
-        The Selenium web driver used to scrape the XFL website.
+        The Selenium web driver used to scrape XFL's website.
     """
     def __init__(self, game_id, wd):
         self._xfl_game_id = None
@@ -548,7 +548,6 @@ class GameBoxscores:
     def _get_games(self, game_ids):
         wd = webdriver.Chrome(executable_path='C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe')
         wd.maximize_window()
-        print(f'type of wd is: {type(wd)}')
         for game_id in game_ids:
             game = GameBoxscore(game_id, wd)
             self._games.append(game)
