@@ -119,7 +119,7 @@ class Games:
 
     def _get_games(self, start_date, end_date):
         url = f'https://statsapi.mlb.com/api/v1/schedule?startDate={start_date}&endDate={end_date}&sportId=1'
-        #print('Getting games from ' + url)
+        print('Getting games from ' + url)
         games = requests.get(url, verify=VERIFY_REQUESTS).json()
         for date in games['dates']:
             for game_data in date['games']:

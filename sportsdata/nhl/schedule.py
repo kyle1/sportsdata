@@ -7,7 +7,19 @@ from dateutil import tz
 
 
 class Game:
-    def __init__(self, game_data):
+    """
+    A representation of a matchup between two teams.
+
+    Stores all relevant high-level match information for a game in a team's
+    schedule including date, time, opponent, and result.
+
+    Parameters
+    ----------
+    game_json : string
+        Dict containing game information
+    """
+
+    def __init__(self, game_json):
         self._nhl_game_id = None
         self._season = None
         self._game_date_time = None
@@ -19,9 +31,9 @@ class Game:
         self._nhl_venue_id = None
         self._nhl_venue_name = None
 
-        self._set_game(game_data)  # todo ??
+        self._parse_game(game_json)  # todo ??
 
-    def _set_game(self, game):
+    def _parse_game(self, game):
         from_zone = tz.gettz('UTC')
         to_zone = tz.gettz('America/Los_Angeles')
         utc = datetime.strptime(game['gameDate'], '%Y-%m-%dT%H:%M:%SZ')
@@ -55,6 +67,20 @@ class Game:
 
 
 class Schedule:
+    """
+    Generates a schedule for the specified time period.
+    Includes wins, losses, and scores if applicable.
+
+    Parameters
+    ----------
+    season : int
+        The requested season to pull stats from.
+    range : list (strings)
+        The requested date range to pull stats from.
+    date : string 
+        The requested date to pull stats from.
+    """
+
     def __init__(self, **kwargs):
         self._games = []
 
@@ -81,7 +107,7 @@ class Schedule:
 
     def _get_games(self, start_date, end_date):
         url = f'https://statsapi.web.nhl.com/api/v1/schedule?startDate={start_date}&endDate={end_date}&sportId=1'
-        #print('Getting games from ' + url)
+        print('Getting schedule from ' + url)
         games = requests.get(url, verify=VERIFY_REQUESTS).json()
         for date in games['dates']:
             for game_data in date['games']:

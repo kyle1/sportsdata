@@ -9,13 +9,13 @@ class Player:
 
     Parameters
     ----------
-    player_data : dict
+    player_json : dict
         Dict that contains player information.
 
     season : int
         Season associated with the player's data.
     """
-    def __init__(self, player_data, season):
+    def __init__(self, player_json, season):
         self._mlb_player_id = None
         self._season = None
         self._full_name = None
@@ -30,7 +30,7 @@ class Player:
         self._bat_side = None
         self._pitch_hand = None
 
-        self._parse_player(player_data, season)
+        self._parse_player(player_json, season)
 
     def _parse_player(self, player, season):
         setattr(self, '_mlb_player_id', player['id'])
@@ -70,12 +70,12 @@ class Player:
 
 class Players:
     """
-    Get MLB players
+    MLB players.
 
     Parameters
     ----------
     season : int
-        Season to get players from.
+        Season to get player data from.
     """
     def __init__(self, season):
         self._players = []
@@ -90,10 +90,10 @@ class Players:
 
     def _get_players(self, season):
         url = f'https://statsapi.mlb.com/api/v1/sports/1/players?season={season}'
-        #print('Getting games from ' + url)
+        print('Getting players from ' + url)
         players = requests.get(url, verify=VERIFY_REQUESTS).json()
-        for person in players['people']:
-            player = Player(person, season)
+        for person_json in players['people']:
+            player = Player(person_json, season)
             self._players.append(player)
 
     @property

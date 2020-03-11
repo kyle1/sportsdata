@@ -4,7 +4,18 @@ from ..constants import VERIFY_REQUESTS
 
 
 class Player:
-    def __init__(self, player_data, nhl_team_id):
+    """
+    NHL player.
+
+    Parameters
+    ----------
+    player_json : dict
+        Dict that contains player information.
+
+    nhl_team_id : int
+        Player's NHL team ID according to NHL's API.
+    """
+    def __init__(self, player_json, nhl_team_id):
         self._nhl_player_id = None
         self._full_name = None
         self._first_name = None
@@ -18,7 +29,7 @@ class Player:
         self._bat_side = None
         self._pitch_hand = None
 
-        self._set_player(player_data, nhl_team_id)
+        self._set_player(player_json, nhl_team_id)
 
     def _set_player(self, player, nhl_team_id):
         setattr(self, '_nhl_player_id', player['person']['id'])
@@ -50,6 +61,13 @@ class Player:
 
 
 class Players:
+    """
+    NHL players.
+
+    Parameters
+    ----------
+    None
+    """
     def __init__(self):
         self._players = []
 
@@ -64,12 +82,12 @@ class Players:
     def _get_players(self):
         # TODO- refer to https://github.com/dword4/nhlapi#teams
         url = f'https://statsapi.web.nhl.com/api/v1/teams?expand=team.roster'
-        # print('Getting games from ' + url)
+        print('Getting games from ' + url)
         teams = requests.get(url, verify=VERIFY_REQUESTS).json()
         for team in teams['teams']:
             nhl_team_id = team['id']
-            for person in team['roster']['roster']:
-                player = Player(person, nhl_team_id)
+            for person_json in team['roster']['roster']:
+                player = Player(person_json, nhl_team_id)
                 self._players.append(player)
 
     @property

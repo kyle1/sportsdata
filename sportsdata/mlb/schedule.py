@@ -17,9 +17,6 @@ class Game:
     ----------
     game_json : string
         Dict containing game information
-
-    year : string
-        The year of the current season.
     """
 
     def __init__(self, game_json):

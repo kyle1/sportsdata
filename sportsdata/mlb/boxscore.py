@@ -11,12 +11,12 @@ from time import sleep
 
 class PlayerBoxscore:
     """
-    MLB player's boxscore data from a game.
+    Player's boxscore data from an individual MLB game.
 
     Parameters
     ----------
     game : GameBoxscore
-        Object that contains game boxscore data.
+        Object that contains game-level boxscore data.
 
     team : string
         'away' or 'home'
@@ -121,12 +121,6 @@ class PlayerBoxscore:
             setattr(self, '_quality_start', quality_start)
 
     def _get_team_result(self, game, team):
-        # if game._away_team_score == game._home_team_score:
-        #     team_result = 'T'
-        # elif (team == 'away') == (game._away_team_score > game._home_team_score):
-        #     team_result = 'W'
-        # else:
-        #     team_result = 'L'
         if game._away_runs == game._home_runs:
             team_result = 'T'
         elif (team == 'away') == (game._away_runs > game._home_runs):
@@ -194,17 +188,17 @@ class PlayerBoxscore:
 
 class PlayerBoxscores:
     """
-    Get MLB players' boxscore data from multiple games.
+    All players' boxscore data from an individual MLB game.
 
     Parameters
     ----------
     game : GameBoxscore
-        Object that contains game boxscore data.
+        Object that contains game-level boxscore data.
 
     team : string
         'away' or 'home'
 
-    players_json : list
+    players_json : list (dict)
         List of dicts that contains the players' boxscore data.
     """
 
@@ -233,11 +227,9 @@ class PlayerBoxscores:
         return pd.concat(frames)
 
 
-# this is the boxscore with both team's data.
-# could have boxscore with data from one team's perspective?
 class GameBoxscore:
     """
-    Game stats for an individual MLB game.
+    Game stats from an individual MLB game.
 
     Parameters
     ----------
@@ -310,7 +302,7 @@ class GameBoxscore:
         setattr(self, '_mlb_game_id', game_id)
 
         url = f'https://statsapi.mlb.com/api/v1/game/{game_id}/feed/live'
-        print(f'getting game data from {url}')
+        print(f'Getting game data from {url}')
         game = requests.get(url, verify=VERIFY_REQUESTS).json()
         utc = datetime.strptime(game['gameData']['datetime']['dateTime'], '%Y-%m-%dT%H:%M:%SZ')
         from_zone = tz.gettz('UTC')
@@ -324,7 +316,7 @@ class GameBoxscore:
         setattr(self, '_game_status', game['gameData']['status']['detailedState'])
 
         url = f'https://statsapi.mlb.com/api/v1/game/{game_id}/boxscore'
-        print(f'getting game boxscore data from {url}')
+        print(f'Getting game boxscore data from {url}')
         box = requests.get(url, verify=VERIFY_REQUESTS).json()
         away_team = box['teams']['away']['team']
         away_team_stats = box['teams']['away']['teamStats']
@@ -452,7 +444,7 @@ class GameBoxscore:
 
 class GameBoxscores:
     """
-    Game stats for multiple games.
+    Game stats from multiple MLB games.
 
     Parameters (kwargs)
     ----------
@@ -490,7 +482,7 @@ class GameBoxscores:
 
     def _get_game_boxscores(self, start_date, end_date):
         url = f'https://statsapi.mlb.com/api/v1/schedule?startDate={start_date}&endDate={end_date}&sportId=1'
-        #print('Getting games from ' + url)
+        print('Getting games from ' + url)
         games = requests.get(url, verify=VERIFY_REQUESTS).json()
         for date in games['dates']:
             for game_data in date['games']:

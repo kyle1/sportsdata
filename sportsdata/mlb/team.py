@@ -9,10 +9,10 @@ class Team:
 
     Parameters
     ----------
-    team : dict
+    team_json : dict
         Dict that contains team information.
     """
-    def __init__(self, team):
+    def __init__(self, team_json):
         self._mlb_team_id = None
         self._team_name = None
         self._mlb_venue_id = None
@@ -22,9 +22,9 @@ class Team:
         self._mlb_league_id = None
         self._mlb_division_id = None
 
-        self._set_team(team)
+        self._parse_team(team_json)
 
-    def _set_team(self, team):
+    def _parse_team(self, team):
         setattr(self, '_mlb_team_id', team['id'])
         setattr(self, '_team_name', team['teamName'])
         setattr(self, '_mlb_venue_id', team['venue']['id'])
@@ -70,7 +70,7 @@ class Teams:
 
     def _get_teams(self):
         url = f'https://statsapi.mlb.com/api/v1/teams?sportId=1'
-        #print('Getting games from ' + url)
+        print('Getting teams from ' + url)
         teams = requests.get(url, verify=VERIFY_REQUESTS).json()
         for team_json in teams['teams']:
             team = Team(team_json)

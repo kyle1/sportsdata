@@ -6,12 +6,12 @@ from time import sleep
 
 class PlayerBoxscore:
     """
-    NHL player's boxscore data from a game.
+    Player's boxscore data from an individual NHL game.
 
     Parameters
     ----------
-    game : dict
-        Dict that contains the game data.
+    game : GameBoxscore
+        Object that contains game-level boxscore data.
 
     team : string
         'away' or 'home'
@@ -142,12 +142,6 @@ class PlayerBoxscore:
             setattr(self, '_only_goalie', goalies_recorded == 1)
 
     def _get_team_result(self, game, team):
-        # if game._away_team_score == game._home_team_score:
-        #     team_result = 'T'
-        # elif (team == 'away') == (game._away_team_score > game._home_team_score):
-        #     team_result = 'W'
-        # else:
-        #     team_result = 'L'
         if game._away_goals == game._home_goals:
             team_result = 'T'
         elif (team == 'away') == (game._away_goals > game._home_goals):
@@ -220,6 +214,21 @@ class PlayerBoxscore:
 
 
 class PlayerBoxscores:
+    """
+    All players' boxscore data from an individual NHL game.
+
+    Parameters
+    ----------
+    game : GameBoxscore
+        Object that contains game-level boxscore data.
+
+    team : string
+        'away' or 'home'
+
+    players_json : list (dict)
+        List of dicts that contains the players' boxscore data.
+    """
+
     def __init__(self, game, team, players_json):
         self._boxscores = []
 
@@ -235,7 +244,7 @@ class PlayerBoxscores:
     def _get_shootout_goals_by_game(self, game_id):
         shootout_goals = []
         url = f'https://statsapi.web.nhl.com/api/v1/game/{game_id}/playByPlay'
-        #print('Getting play-by-play data for shootout stats from ' + url)
+        print('Getting play-by-play data for shootout stats from ' + url)
         pbp = requests.get(url, verify=VERIFY_REQUESTS).json()
         for play in pbp["allPlays"]:
             if (play["about"]["periodType"] == 'SHOOTOUT') and 'players' in play and play['result']['event'] == 'Goal':
@@ -283,7 +292,7 @@ from dateutil import tz
 
 class GameBoxscore:
     """
-    Game stats for an individual NHL game.
+    Game stats from an individual NHL game.
 
     Parameters
     ----------
@@ -433,6 +442,19 @@ class GameBoxscore:
 
 
 class GameBoxscores:
+    #todo- setup kwargs like MLB GameBoxscores ?
+    """
+    Game stats from multiple NHL games.
+
+    Parameters (kwargs)
+    ----------
+    start_date : string
+        Beginning date to get game boxscores from ('MM/DD/YYYY' format)
+
+    end_date : string
+        End date to get game boxscores from ('MM/DD/YYYY' format)
+    """
+
     def __init__(self, start_date, end_date):
         self._boxscores = []
 

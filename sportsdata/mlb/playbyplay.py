@@ -11,7 +11,7 @@ class Play:
     Parameters
     ----------
     game_id : int
-        MLB API's game id
+        The game ID according to MLB's API.
 
     play_json : dict
         Dict that contains play information.
@@ -97,6 +97,14 @@ class Play:
 
 
 class PlayByPlay:
+    """
+    Represents all plays for an individual MLB game.
+
+    Parameters
+    ----------
+    game_id : int
+        The game ID according to MLB's API.
+    """
     def __init__(self, game_id):
         self._plays = []
 
@@ -109,8 +117,9 @@ class PlayByPlay:
         return iter(self.__repr__())
 
     def _get_play_by_play(self, game_id):
-        pbp_json = requests.get(
-            f'https://statsapi.mlb.com/api/v1/game/{game_id}/playByPlay', verify=VERIFY_REQUESTS).json()
+        url = f'https://statsapi.mlb.com/api/v1/game/{game_id}/playByPlay'
+        print('Getting play-by-play data from ' + url)
+        pbp_json = requests.get(url, verify=VERIFY_REQUESTS).json()
         for play_json in pbp_json['allPlays']:
             play = Play(game_id, play_json)
             self._plays.append(play)
@@ -123,27 +132,27 @@ class PlayByPlay:
         return pd.concat(frames)
 
 
-class PlayByPlays:
-    def __init__(self, games):
-        self._play_by_plays = []
+# class PlayByPlays:
+#     def __init__(self, games):
+#         self._play_by_plays = []
 
-        self._get_play_by_plays(games)
+#         self._get_play_by_plays(games)
 
-    def __repr__(self):
-        return self._play_by_plays
+#     def __repr__(self):
+#         return self._play_by_plays
 
-    def __iter__(self):
-        return iter(self.__repr__())
+#     def __iter__(self):
+#         return iter(self.__repr__())
 
-    def _get_play_by_plays(self, games):
-        for game in games:
-            pbp = PlayByPlay(game._mlb_game_id)
-            self._play_by_plays.append(pbp)
-            sleep(5)
+#     def _get_play_by_plays(self, games):
+#         for game in games:
+#             pbp = PlayByPlay(game._mlb_game_id)
+#             self._play_by_plays.append(pbp)
+#             sleep(5)
 
-    @property
-    def dataframes(self):
-        frames = []
-        for pbp in self.__iter__():
-            frames.append(pbp.dataframes)
-        return pd.concat(frames)
+#     @property
+#     def dataframes(self):
+#         frames = []
+#         for pbp in self.__iter__():
+#             frames.append(pbp.dataframes)
+#         return pd.concat(frames)

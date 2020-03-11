@@ -12,6 +12,17 @@ from time import sleep
 
 
 class PlayerBoxscore:
+    """
+    Player's boxscore data from an individual XFL game.
+
+    Parameters
+    ----------
+    box_json : dict
+        Dict that contains the player's boxscore data.
+
+    scoring_plays : ScoringPlays
+        Object that contains scoring play information.
+    """
     def __init__(self, box_json, scoring_plays):
         # self._xfl_player_id = None
         self._player_name = None
@@ -134,15 +145,15 @@ class PlayerBoxscore:
 
 class PlayerBoxscores:
     """
-    XFL players boxscore data from games.
+    All players' boxscore data from an individual XFL game.
 
     Parameters
     ----------
-    week : int
-        XFL week number.
+    game : GameBoxscore
+        Object that contains game-level boxscore data.
 
-    id : int
-        XFL game ID.
+    wd : Selenium WebDriver
+        The Selenium web driver used to scrape the XFL website.
     """
 
     def __init__(self, game, wd):
@@ -293,6 +304,17 @@ class PlayerBoxscores:
         return pd.concat(frames)
 
 class GameBoxscore:
+    """
+    Game stats from an individual XFL game.
+
+    Parameters
+    ----------
+    game_id : int
+        The game ID according to XFL's website.
+
+    wd : Selenium WebDriver
+        The Selenium web driver used to scrape the XFL website.
+    """
     def __init__(self, game_id, wd):
         self._xfl_game_id = None
         self._season = None
@@ -484,18 +506,18 @@ class GameBoxscore:
 
 class GameBoxscores:
     """
-    XFL games
+    Game stats from multiple XFL games.
 
-    Parameters
+    Parameters (kwargs)
     ----------
     season : int
-        XFL season.
+        Season (year) to get game boxscores from.
 
     week : int
-        XFL week number.
+        XFL week number to get game boxscores from.
 
     id : int
-        XFL game ID.
+        XFL game ID according to XFL's website.
     """
 
     def __init__(self, **kwargs):
@@ -526,6 +548,7 @@ class GameBoxscores:
     def _get_games(self, game_ids):
         wd = webdriver.Chrome(executable_path='C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe')
         wd.maximize_window()
+        print(f'type of wd is: {type(wd)}')
         for game_id in game_ids:
             game = GameBoxscore(game_id, wd)
             self._games.append(game)

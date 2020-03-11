@@ -5,6 +5,15 @@ from datetime import datetime
 
 
 class GameOdds:
+    """
+    Game-level betting information for an individual NHL game.
+
+    Parameters
+    ----------
+    event : dict
+        Dict that contains the betting event data.
+    """
+
     def __init__(self, odds):
         self._event_description = None
         self._event_start_time = None
@@ -81,6 +90,13 @@ class GameOdds:
 
 
 class GamesOdds:
+    """
+    Game-level betting information for multiple NHL games.
+
+    Parameters
+    ----------
+    None
+    """
     def __init__(self):
         self._odds = []
 

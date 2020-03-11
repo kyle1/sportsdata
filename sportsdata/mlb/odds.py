@@ -6,7 +6,7 @@ from datetime import datetime
 
 class GameOdds:
     """
-    Game-level betting odds.
+    Game-level betting information for an individual MLB game.
 
     Parameters
     ----------
@@ -91,7 +91,11 @@ class GameOdds:
 
 class GamesOdds:
     """
-    Game-level betting odds for multiple games
+    Game-level betting information for multiple MLB games.
+
+    Parameters
+    ----------
+    None
     """
 
     def __init__(self):
