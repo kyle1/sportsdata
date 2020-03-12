@@ -2,6 +2,17 @@ import pandas as pd
 
 
 class ScoringPlay:
+    """
+    Details of a play resulting in a score.
+
+    Parameters
+    ----------
+    game : GameBoxscore
+        Object that contains game-level boxscore data.
+
+    tr : dict
+        HTML table row that is parsed for play information.
+    """
     def __init__(self, game, tr):
         self._xfl_game_id = None
         self._xfl_team_abbrev = None
@@ -65,6 +76,17 @@ class ScoringPlay:
 
 
 class ScoringPlays:
+    """
+    Details of a plays resulting in a score.
+
+    Parameters
+    ----------
+    game : GameBoxscore
+        Object that contains game-level boxscore data.
+
+    scoring_table : dict
+        HTML Table that is parsed for play information.
+    """
     def __init__(self, game, scoring_table):
         self._scoring_plays = []
 

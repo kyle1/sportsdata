@@ -13,7 +13,6 @@ class GameOdds:
     event : dict
         Dict that contains the betting event data.
     """
-
     def __init__(self, odds):
         self._event_description = None
         self._event_start_time = None

@@ -24,7 +24,6 @@ class PlayerBoxscore:
     box_json : dict
         Dict that contains the player's boxscore data.
     """
-
     def __init__(self, game, team, box_json):
         self._mlb_player_id = None
         self._mlb_game_id = None
@@ -201,7 +200,6 @@ class PlayerBoxscores:
     players_json : list (dict)
         List of dicts that contains the players' boxscore data.
     """
-
     def __init__(self, game, team, players_json):
         self._boxscores = []
 
@@ -236,7 +234,6 @@ class GameBoxscore:
     game_id : int
         The game ID according to MLB's API.
     """
-
     def __init__(self, game_id):
         self._mlb_game_id = None
         self._season = None
@@ -458,7 +455,6 @@ class GameBoxscores:
     date : string
         Date to get game boxscores from ('MM/DD/YYYY' format).
     """
-
     def __init__(self, **kwargs):
         self._boxscores = []
 

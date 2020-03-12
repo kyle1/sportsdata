@@ -5,7 +5,15 @@ from constants import NBA_API_TEAMS
 
 
 class Team:
-    def __init__(self, team):
+    """
+    NBA team.
+
+    Parameters
+    ----------
+    team_json : dict
+        Dict that contains team information.
+    """
+    def __init__(self, team_json):
         self._nba_team_id = None
         self._team_name = None
         #self._nba_venue_id = None
@@ -15,7 +23,7 @@ class Team:
         #self._nba_conference_id = None
         #self._nba_division_id = None
 
-        self._set_team(team)
+        self._parse_team(team_json)
 
     def _set_team(self, team):
         setattr(self, '_nba_team_id', team['team_id'])
@@ -43,6 +51,13 @@ class Team:
 
 
 class Teams:
+    """
+    NBA teams.
+
+    Parameters
+    ----------
+    None
+    """
     def __init__(self):
         self._teams = []
 

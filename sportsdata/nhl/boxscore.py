@@ -25,7 +25,6 @@ class PlayerBoxscore:
     goalies_recorded : int
         Number of goalies on the player's team that played in the game.
     """
-
     def __init__(self, game, team, box_json, shootout_goals, goalies_recorded):
         self._nhl_player_id = None
         self._nhl_game_id = None
@@ -228,7 +227,6 @@ class PlayerBoxscores:
     players_json : list (dict)
         List of dicts that contains the players' boxscore data.
     """
-
     def __init__(self, game, team, players_json):
         self._boxscores = []
 
@@ -446,7 +444,7 @@ class GameBoxscores:
     """
     Game stats from multiple NHL games.
 
-    Parameters (kwargs)
+    Parameters
     ----------
     start_date : string
         Beginning date to get game boxscores from ('MM/DD/YYYY' format)
@@ -454,7 +452,6 @@ class GameBoxscores:
     end_date : string
         End date to get game boxscores from ('MM/DD/YYYY' format)
     """
-
     def __init__(self, start_date, end_date):
         self._boxscores = []
 

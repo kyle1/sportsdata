@@ -13,7 +13,6 @@ class GameOdds:
     event : dict
         Dict that contains the betting event data.
     """
-
     def __init__(self, event):
         self._event_description = None
         self._event_start_time = None
@@ -97,7 +96,6 @@ class GamesOdds:
     ----------
     None
     """
-
     def __init__(self):
         self._odds = []
 

@@ -16,7 +16,6 @@ class Play:
     play_json : dict
         Dict that contains play information.
     """
-
     def __init__(self, game_id, play_json):
         self._mlb_game_id = None
         self._result_type = None

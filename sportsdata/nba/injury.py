@@ -4,6 +4,14 @@ from pyquery import PyQuery as pq
 
 
 class Injury:
+    """
+    Player injury information.
+
+    Parameters
+    ----------
+    tr : dict
+        HTML table row that is parsed for injury data.
+    """
     def __init__(self, tr):
         self._report_date = None
         self._player_name = None
@@ -13,9 +21,9 @@ class Injury:
         self._injury_type = None
         self._details = None
 
-        self._parse_tr(tr)
+        self._parse_injury_row(tr)
 
-    def _parse_tr(self, tr):
+    def _parse_injury_row(self, tr):
         setattr(self, '_report_date', datetime.today().date().isoformat())
         for th in tr('th').items():
             if th.attr['data-stat'] == 'player':
@@ -50,6 +58,13 @@ class Injury:
 
 
 class Injuries:
+    """
+    Players injury information.
+
+    Parameters
+    ----------
+    None
+    """
     def __init__(self):
         self._injuries = []
 
@@ -62,7 +77,9 @@ class Injuries:
         return iter(self.__repr__())
 
     def _get_injuries(self):
-        injuries_html = pq('https://www.basketball-reference.com/friv/injuries.cgi', verify=VERIFY_REQUESTS)
+        url = 'https://www.basketball-reference.com/friv/injuries.cgi'
+        print('Getting data from ' + url)
+        injuries_html = pq(url, verify=VERIFY_REQUESTS)
         for table in injuries_html('table').items():
             if table.attr['id'] == 'injuries':
                 injuries_table = table

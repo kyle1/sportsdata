@@ -1,11 +1,9 @@
 import pandas as pd
 import requests
 from constants import PROXIES, NBA_REQUEST_HEADERS
-from datetime import datetime, timedelta
-from time import sleep
 
 
-class PlayerBoxscore:
+class Boxscore:
     """
     Player's boxscore data from an individual NBA game.
 
@@ -20,6 +18,7 @@ class PlayerBoxscore:
     row : dict
         Dict that contains the player's boxscore data. todo??
     """
+
     def __init__(self, game, headers, row):
         self._nba_player_id = None
         self._nba_game_id = None
@@ -131,19 +130,12 @@ class PlayerBoxscore:
         return pd.DataFrame([fields_to_include], index=None)
 
 
-class PlayerBoxscores:
-    """
-    All players' boxscore data from multiple NBA games.
-
-    Parameters
-    ----------
-    games : GameBoxscore
-        List of objects that contain game-level boxscore data.
-    """
+class Boxscores:
     def __init__(self, games):
         self._boxscores = []
 
         self._get_boxscores_by_games(games)
+        # print(games)
 
     def __repr__(self):
         return self._boxscores
@@ -165,8 +157,8 @@ class PlayerBoxscores:
                 stat_headers = results['headers']
                 row_set = results['rowSet']
                 for row in row_set:
-                    player_boxscore = PlayerBoxscore(game, stat_headers, row)
-                    self._boxscores.append(player_boxscore)
+                    boxscore = Boxscore(game, stat_headers, row)
+                    self._boxscores.append(boxscore)
 
     @property
     def dataframes(self):
@@ -174,137 +166,3 @@ class PlayerBoxscores:
         for boxscore in self.__iter__():
             frames.append(boxscore.dataframe)
         return pd.concat(frames)
-
-
-class GameBoxscore:
-    """
-    Game stats from an individual NBA game.
-
-    Parameters
-    ----------
-    season : int
-        The NBA season associated with the game.
-    
-    game_json : dict
-        Dict that contains the game boxscore data.
-    """
-    def __init__(self, season, game_json):
-        self._nba_game_id = None
-        self._nba_game_id_str = None
-        self._season = None
-        self._game_date_time = None
-        self._game_date = None
-        self._game_time = None
-        self._game_status = None
-        self._away_team_id = None
-        self._away_team_score = None
-        self._away_team_record_wins = None
-        self._away_team_record_losses = None
-        self._home_team_id = None
-        self._home_team_score = None
-        self._home_team_record_wins = None
-        self._home_team_record_losses = None
-        self._nba_venue_name = None
-
-        self._create_game(season, game_json)
-
-    def _create_game(self, season, game):
-        game_dt = datetime.strptime(game['etm'], '%Y-%m-%dT%H:%M:%S') + timedelta(hours=-3)
-        game_date = game_dt.date()
-        game_time = game_dt.time()
-        setattr(self, '_nba_game_id', int(game['gid']))
-        setattr(self, '_nba_game_id_str', game['gid'])
-        setattr(self, '_season', season)  # todo?
-        setattr(self, '_game_date_time', game_dt.isoformat())
-        setattr(self, '_game_date', game_date.isoformat())
-        setattr(self, '_game_time', game_time.isoformat())
-        setattr(self, '_game_status', game['stt'])
-        setattr(self, '_away_team_id', int(game['v']['tid']))
-        setattr(self, '_away_team_score', int(game['v']['s']))
-        setattr(self, '_away_team_record_wins', int(game['v']['re'].split('-')[0]))
-        setattr(self, '_away_team_record_losses', int(game['v']['re'].split('-')[1]))
-        setattr(self, '_home_team_id', int(game['h']['tid']))
-        setattr(self, '_home_team_score', int(game['h']['s']))
-        setattr(self, '_home_team_record_wins', int(game['h']['re'].split('-')[0]))
-        setattr(self, '_home_team_record_losses', int(game['h']['re'].split('-')[1]))
-        setattr(self, '_nba_venue_name', game['an'])
-
-    @property
-    def dataframe(self):
-        fields_to_include = {
-            'NbaGameId': self._nba_game_id,
-            'Season': self._season,
-            'GameDateTime': self._game_date_time,
-            'GameDate': self._game_date,
-            'GameTime': self._game_time,
-            'GameStatus': self._game_status,
-            'AwayTeamId': self._away_team_id,
-            'AwayTeamScore': self._away_team_score,
-            'AwayTeamRecordWins': self._away_team_record_wins,
-            'AwayTeamRecordLosses': self._away_team_record_losses,
-            'HomeTeamId': self._home_team_id,
-            'HomeTeamScore': self._home_team_score,
-            'HomeTeamRecordWins': self._home_team_record_wins,
-            'HomeTeamRecordLosses': self._home_team_record_losses,
-            'NbaVenueName': self._nba_venue_name
-        }
-        return pd.DataFrame([fields_to_include], index=[self._nba_game_id])
-
-
-class GameBoxscores:
-    #todo- setup kwargs like MLB GameBoxscores ?
-    """
-    Game stats from multiple NBA games.
-
-    Parameters
-    ----------
-    season : int
-        Season (year) to get game boxscores from.
-
-    start_date : string
-        Beginning date to get game boxscores from ('MM/DD/YYYY' format)
-
-    end_date : string
-        End date to get game boxscores from ('MM/DD/YYYY' format)
-    """
-    def __init__(self, season, start_date, end_date):
-        self._boxscores = []
-
-        self._get_game_boxscores(season, start_date, end_date)
-
-    def __repr__(self):
-        return self._boxscores
-
-    def __iter__(self):
-        return iter(self.__repr__())
-
-    def _get_games(self, season, start_date, end_date):
-        url = f'http://data.nba.com/data/10s/v2015/json/mobile_teams/nba/{season}/league/00_full_schedule.json'  # todo
-        games = requests.get(url).json()
-        begin = datetime.strptime(start_date, '%m/%d/%Y').date()
-        end = datetime.strptime(end_date, '%m/%d/%Y').date()
-        for item in games['lscd']:
-            for game_data in item['mscd']['g']:
-                game_dt = datetime.strptime(game_data['etm'], '%Y-%m-%dT%H:%M:%S') + timedelta(hours=-3)
-                game_date = game_dt.date()
-                game_time = game_dt.time()
-                if game_date < begin or game_date > end or game_data['stt'] == 'PPD':
-                    # Only get games in the specified date range that were not postponed.
-                    continue
-                boxscore = GameBoxscore(season, game_data)
-                self._boxscore.append(boxscore)
-                sleep(5)
-
-    @property
-    def dataframes(self):
-        frames = []
-        for boxscore in self.__iter__():
-            frames.append(boxscore.dataframe)
-        return pd.concat(frames)
-
-    #todo- implement this in other classes?
-    @property
-    def dicts(self):
-        df = self.dataframes
-        dicts = df.to_dict('records')
-        return dicts

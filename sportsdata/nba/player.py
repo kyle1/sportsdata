@@ -1,4 +1,3 @@
-# TODO: setup nba player classes
 import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
@@ -7,7 +6,21 @@ from time import sleep
 
 
 class Player:
-    def __init__(self, player, stat_headers, nba_team_id):
+    """
+    NBA player.
+
+    Parameters
+    ----------
+    player_data : list
+        List that contains player stat values.
+
+    stat_headers : list
+        List that contains player stat categories.
+
+    team_id : int
+        The ID belonging to the player's NBA team, according to NBA's API.
+    """
+    def __init__(self, player_data, stat_headers, team_id):
         self._nba_player_id = None
         self._full_name = None
         self._first_name = None
@@ -19,19 +32,19 @@ class Player:
         self._position = None
         self._debut_date = None
 
-        self._set_player(player, stat_headers)
+        self._parse_player(player_data, stat_headers)
 
-    def _set_player(self, player, stat_headers, nba_team_id):
-        p = {}
+    def _parse_player(self, player_data, stat_headers, team_id):
+        player = {}
         for i in range(len(stat_headers)):
-            p[stat_headers[i]] = player[i]
-        setattr(self, '_nba_player_id', p['PLAYER_ID'])
-        setattr(self, '_full_name', p['PLAYER'])
-        setattr(self, '_birth_date', p['BIRTH_DATE'].replace(',', '').replace('"', ''))
-        setattr(self, '_player_height', p['HEIGHT'])
-        setattr(self, '_player_weight', p['WEIGHT'])
-        setattr(self, '_nba_team_id', nba_team_id)
-        setattr(self, '_position', p['POSITION'])
+            player[stat_headers[i]] = player_data[i]
+        setattr(self, '_nba_player_id', player['PLAYER_ID'])
+        setattr(self, '_full_name', player['PLAYER'])
+        setattr(self, '_birth_date', player['BIRTH_DATE'].replace(',', '').replace('"', ''))
+        setattr(self, '_player_height', player['HEIGHT'])
+        setattr(self, '_player_weight', player['WEIGHT'])
+        setattr(self, '_nba_team_id', team_id)
+        setattr(self, '_position', player['POSITION'])
 
     @property
     def dataframe(self):
@@ -51,6 +64,13 @@ class Player:
 
 
 class Players:
+    """
+    NBA players.
+
+    Parameters
+    ----------
+    None
+    """
     def __init__(self):
         self._players = []
 

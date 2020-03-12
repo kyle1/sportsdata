@@ -12,10 +12,10 @@ class Player:
     player_json : dict
         Dict that contains player information.
 
-    nhl_team_id : int
+    team_id : int
         Player's NHL team ID according to NHL's API.
     """
-    def __init__(self, player_json, nhl_team_id):
+    def __init__(self, player_json, team_id):
         self._nhl_player_id = None
         self._full_name = None
         self._first_name = None
@@ -29,9 +29,9 @@ class Player:
         self._bat_side = None
         self._pitch_hand = None
 
-        self._set_player(player_json, nhl_team_id)
+        self._set_player(player_json, team_id)
 
-    def _set_player(self, player, nhl_team_id):
+    def _set_player(self, player, team_id):
         setattr(self, '_nhl_player_id', player['person']['id'])
         setattr(self, '_full_name', player['person']['fullName'])
         #setattr(self, '_first_name', player['firstName'])
@@ -39,7 +39,7 @@ class Player:
         #setattr(self, '_birth_date', player['birthDate'])
         #setattr(self, '_player_height', player['height'])
         #setattr(self, '_player_weight', player['weight'])
-        setattr(self, '_nhl_team_id', nhl_team_id)
+        setattr(self, '_nhl_team_id', team_id)
         setattr(self, '_position', player['position']['abbreviation'])
         #setattr(self, '_debut_date', player['mlbDebutDate'])
 

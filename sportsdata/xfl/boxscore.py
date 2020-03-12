@@ -155,7 +155,6 @@ class PlayerBoxscores:
     wd : Selenium WebDriver
         The Selenium web driver used to scrape XFL's website.
     """
-
     def __init__(self, game, wd):
         self._boxscores = []
 
@@ -519,7 +518,6 @@ class GameBoxscores:
     id : int
         XFL game ID according to XFL's website.
     """
-
     def __init__(self, **kwargs):
         self._games = []
 

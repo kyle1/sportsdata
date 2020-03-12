@@ -16,9 +16,8 @@ class Game:
     Parameters
     ----------
     game_json : string
-        Dict containing game information
+        Dict containing game information.
     """
-
     def __init__(self, game_json):
         self._mlb_game_id = None
         self._season = None
@@ -75,7 +74,7 @@ class Schedule:
     Generates a schedule for the specified time period.
     Includes wins, losses, and scores if applicable.
 
-    Parameters
+    Parameters (kwargs)
     ----------
     season : int
         The requested season to pull stats from.
@@ -84,7 +83,6 @@ class Schedule:
     date : string 
         The requested date to pull stats from.
     """
-
     def __init__(self, **kwargs):
         self._games = []
 

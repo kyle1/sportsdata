@@ -8,6 +8,17 @@ from time import sleep
 
 
 class Player:
+    """
+    XFL player.
+
+    Parameters
+    ----------
+    tr : dict
+        Table row that is parsed for player data.
+
+    team_id : int
+        The ID belonging to the player's XFL team.
+    """
     def __init__(self, tr, team_id):
         self._xfl_player_id = None
         self._full_name = None
@@ -18,9 +29,9 @@ class Player:
         self._jersey_number = None
         self._college = None
 
-        self._set_player(tr, team_id)
+        self._parse_player(tr, team_id)
 
-    def _set_player(self, tr, team_id):
+    def _parse_player(self, tr, team_id):
         # Determine if row has first name and last name as one column or two columns.
         td_list = list(tr('td').items())
         separate_name_cols = len(td_list) == 7
@@ -54,6 +65,13 @@ class Player:
 
 
 class Players:
+    """
+    XFL players.
+
+    Parameters
+    ----------
+    None
+    """
     def __init__(self):
         self._players = []
 

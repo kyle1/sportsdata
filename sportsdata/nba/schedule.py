@@ -7,7 +7,21 @@ from dateutil import tz
 
 
 class Game:
-    def __init__(self, game_data, season):
+    """
+    A representation of a matchup between two teams.
+
+    Stores all relevant high-level match information for a game in a team's
+    schedule including date, time, opponent, and result.
+
+    Parameters
+    ----------
+    game_json : string
+        Dict containing game information.
+
+    season : int
+        Season associated with the game.
+    """
+    def __init__(self, game_json, season):
         self._nba_game_id = None
         self._season = None
         self._game_date_time = None
@@ -19,7 +33,7 @@ class Game:
         self._nba_venue_id = None
         self._nba_venue_name = None
 
-        self._parse_game(game_data, season)
+        self._parse_game(game_json, season)
 
     def _parse_game(self, game, season):
         game_dt = datetime.strptime(game['etm'], '%Y-%m-%dT%H:%M:%S') + timedelta(hours=-3) # EST
@@ -50,6 +64,19 @@ class Game:
 
 
 class Schedule:
+    """
+    Generates a schedule for the specified time period.
+    Includes wins, losses, and scores if applicable.
+
+    Parameters (kwargs)
+    ----------
+    season : int
+        The requested season to pull stats from.
+    range : list (strings)
+        The requested date range to pull stats from.
+    date : string 
+        The requested date to pull stats from.
+    """
     def __init__(self, **kwargs):
         self._games = []
 
@@ -74,9 +101,9 @@ class Schedule:
     def __iter__(self):
         return iter(self.__repr__())
 
-    def _get_games(self, season, start_date, end_date):
+    def _get_schedule(self, season, start_date, end_date):
         url = f'http://data.nba.com/data/10s/v2015/json/mobile_teams/nba/{season}/league/00_full_schedule.json'
-        #print('Getting games from ' + url)
+        print('Getting schedule from ' + url)
         schedule = requests.get(url, verify=VERIFY_REQUESTS).json()
         begin = datetime.strptime(start_date, '%m/%d/%Y').date()
         end = datetime.strptime(end_date, '%m/%d/%Y').date()

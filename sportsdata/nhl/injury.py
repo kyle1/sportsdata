@@ -10,7 +10,7 @@ class Injury:
     Parameters
     ----------
     tr : dict
-        Table row that is parsed for injury data.
+        HTML table row that is parsed for injury data.
     """
     def __init__(self, tr):
         self._report_date = None
@@ -75,7 +75,7 @@ class Injuries:
         return iter(self.__repr__())
 
     def _get_injuries(self):
-        url = https://www.hockey-reference.com/friv/injuries.cgi
+        url = 'https://www.hockey-reference.com/friv/injuries.cgi'
         print('Getting data from ' + url)
         injuries_html = pq(url, verify=VERIFY_REQUESTS)
         for table in injuries_html('table').items():
