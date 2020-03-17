@@ -130,6 +130,11 @@ class PlayerBoxscore:
         }
         return pd.DataFrame([fields_to_include], index=None)
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        return dic
 
 class PlayerBoxscores:
     """
@@ -175,6 +180,13 @@ class PlayerBoxscores:
             frames.append(boxscore.dataframe)
         return pd.concat(frames)
 
+    @property
+    def to_dicts(self):
+        dics = []
+        for boxscore in self.__iter__():
+            dics.append(boxscore.to_dict)
+        return dics
+
 
 class GameBoxscore:
     """
@@ -189,6 +201,7 @@ class GameBoxscore:
         Dict that contains the game boxscore data.
     """
     def __init__(self, season, game_json):
+        #TODO
         self._nba_game_id = None
         self._nba_game_id_str = None
         self._season = None
@@ -250,6 +263,13 @@ class GameBoxscore:
         }
         return pd.DataFrame([fields_to_include], index=[self._nba_game_id])
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        dic['AwayPlayers'] = self._away_players.to_dicts
+        dic['HomePlayers'] = self._home_players.to_dicts
+        return dic
 
 class GameBoxscores:
     #todo- setup kwargs like MLB GameBoxscores ?
@@ -302,9 +322,9 @@ class GameBoxscores:
             frames.append(boxscore.dataframe)
         return pd.concat(frames)
 
-    #todo- implement this in other classes?
     @property
-    def dicts(self):
-        df = self.dataframes
-        dicts = df.to_dict('records')
-        return dicts
+    def to_dicts(self):
+        dics = []
+        for boxscore in self.__iter__():
+            dics.append(boxscore.to_dict)
+        return dics

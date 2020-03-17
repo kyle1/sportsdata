@@ -1,6 +1,8 @@
 import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
+from datetime import datetime, timedelta
+from dateutil import tz
 from time import sleep
 
 
@@ -211,6 +213,12 @@ class PlayerBoxscore:
         }
         return pd.DataFrame([fields_to_include], index=None)
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        return dic
+
 
 class PlayerBoxscores:
     """
@@ -281,11 +289,12 @@ class PlayerBoxscores:
             frames.append(boxscore.dataframe)
         return pd.concat(frames)
 
-
-import pandas as pd
-import requests
-from datetime import datetime, timedelta
-from dateutil import tz
+    @property
+    def to_dicts(self):
+        dics = []
+        for boxscore in self.__iter__():
+            dics.append(boxscore.to_dict)
+        return dics
 
 
 class GameBoxscore:
@@ -438,6 +447,14 @@ class GameBoxscore:
         }
         return pd.DataFrame([fields_to_include], index=[self._nhl_game_id])
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        dic['AwayPlayers'] = self._away_players.to_dicts
+        dic['HomePlayers'] = self._home_players.to_dicts
+        return dic
+
 
 class GameBoxscores:
     #todo- setup kwargs like MLB GameBoxscores ?
@@ -479,3 +496,10 @@ class GameBoxscores:
         for boxscore in self.__iter__():
             frames.append(boxscore.dataframe)
         return pd.concat(frames)
+
+    @property
+    def to_dicts(self):
+        dics = []
+        for boxscore in self.__iter__():
+            dics.append(boxscore.to_dict)
+        return dics

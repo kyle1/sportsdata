@@ -74,6 +74,12 @@ class ScoringPlay:
         }
         return pd.DataFrame([fields_to_include], index=None)
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        return dic
+        
 
 class ScoringPlays:
     """
@@ -110,3 +116,10 @@ class ScoringPlays:
         for scoring_play in self.__iter__():
             frames.append(scoring_play.dataframe)
         return pd.concat(frames)
+
+    @property
+    def to_dicts(self):
+        dics = []
+        for scoring_play in self.__iter__():
+            dics.append(scoring_play.to_dict)
+        return dics

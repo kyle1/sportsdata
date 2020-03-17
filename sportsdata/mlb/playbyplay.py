@@ -94,6 +94,12 @@ class Play:
         }
         return pd.DataFrame([fields_to_include], index=None)
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        return dic
+        
 
 class PlayByPlay:
     """
@@ -129,6 +135,13 @@ class PlayByPlay:
         for play in self.__iter__():
             frames.append(play.dataframe)
         return pd.concat(frames)
+
+    @property
+    def to_dicts(self):
+        dics = []
+        for play in self.__iter__():
+            dics.append(play.to_dict)
+        return dics
 
 
 # class PlayByPlays:

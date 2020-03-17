@@ -87,6 +87,12 @@ class GameOdds:
         }
         return pd.DataFrame([fields_to_include], index=[self._event_description])
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        return dic
+
 
 class GamesOdds:
     """
@@ -127,3 +133,11 @@ class GamesOdds:
         for odds in self.__iter__():
             frames.append(odds.dataframe)
         return pd.concat(frames)
+
+    @property
+    def to_dicts(self):
+        dics = []
+        for odds in self.__iter__():
+            dics.append(odds.to_dict)
+        return dics
+        

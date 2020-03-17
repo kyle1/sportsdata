@@ -59,6 +59,12 @@ class Player:
         }
         return pd.DataFrame([fields_to_include], index=[self._nhl_player_id])
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        return dic
+
 
 class Players:
     """
@@ -96,3 +102,10 @@ class Players:
         for player in self.__iter__():
             frames.append(player.dataframe)
         return pd.concat(frames)
+
+    @property
+    def to_dicts(self):
+        dics = []
+        for player in self.__iter__():
+            dics.append(player.to_dict)
+        return dics

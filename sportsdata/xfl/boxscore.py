@@ -142,6 +142,12 @@ class PlayerBoxscore:
         }
         return pd.DataFrame([fields_to_include], index=None)
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        return dic
+
 
 class PlayerBoxscores:
     """
@@ -301,6 +307,14 @@ class PlayerBoxscores:
         for boxscore in self.__iter__():
             frames.append(boxscore.dataframe)
         return pd.concat(frames)
+
+    @property
+    def to_dicts(self):
+        dics = []
+        for boxscore in self.__iter__():
+            dics.append(boxscore.to_dict)
+        return dics
+
 
 class GameBoxscore:
     """
@@ -502,6 +516,14 @@ class GameBoxscore:
         }
         return pd.DataFrame([fields_to_include], index=[self._xfl_game_id])
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        dic['AwayPlayers'] = self._away_players.to_dicts
+        dic['HomePlayers'] = self._home_players.to_dicts
+        return dic
+
 
 class GameBoxscores:
     """
@@ -556,3 +578,10 @@ class GameBoxscores:
         for game in self.__iter__():
             frames.append(game.dataframe)
         return pd.concat(frames)
+
+    @property
+    def to_dicts(self):
+        dics = []
+        for boxscore in self.__iter__():
+            dics.append(boxscore.to_dict)
+        return dics

@@ -30,9 +30,11 @@ from sportsdata.mlb.team import Team, Teams
 # schedule = Schedule(season=2019)
 # print(schedule.dataframes)
 
-BASE_URL = 'https://localhost:44374/api/'
+# BASE_URL = 'https://localhost:44374/api/'
+# boxscores = GameBoxscores(date='10/30/2019')
+# boxscore_dicts = boxscores.to_dicts
+# response = requests.post(url=BASE_URL + 'mlb/boxscores', json=boxscore_dicts, verify=False).json()
 
-boxscores = GameBoxscores(date='10/30/2019')
-boxscore_dicts = boxscores.to_dicts
-
-response = requests.post(url=BASE_URL + 'mlb/boxscores', json=boxscore_dicts, verify=False).json()
+players = Players(2019)
+player_dicts = players.to_dicts
+print(player_dicts)

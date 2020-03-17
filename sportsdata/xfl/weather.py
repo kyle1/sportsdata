@@ -50,6 +50,12 @@ class GameWeather:
         }
         return pd.DataFrame([fields_to_include], index=[self._xfl_game_id])
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        return dic
+
 
 class GameWeathers:
       def __init__(self, week):
@@ -81,3 +87,10 @@ class GameWeathers:
         for weather in self.__iter__():
             frames.append(weather.dataframe)
         return pd.concat(frames)
+
+    @property
+    def to_dicts(self):
+        dics = []
+        for weather in self.__iter__():
+            dics.append(weather.to_dict)
+        return dics

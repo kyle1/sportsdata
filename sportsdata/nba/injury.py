@@ -56,6 +56,12 @@ class Injury:
         }
         return pd.DataFrame([fields_to_include], index=[self._report_date])
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        return dic
+        
 
 class Injuries:
     """
@@ -97,3 +103,10 @@ class Injuries:
         for injury in self.__iter__():
             frames.append(injury.dataframe)
         return pd.concat(frames)
+
+    @property
+    def to_dicts(self):
+        dics = []
+        for injury in self.__iter__():
+            dics.append(injury.to_dict)
+        return dics

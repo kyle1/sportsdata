@@ -460,7 +460,6 @@ class GameBoxscore:
     def to_dict(self):
         dataframe = self.dataframe
         dic = dataframe.to_dict('records')[0]
-        #dic['GameDateTime'] = dic['GameDateTime'].isoformat()
         dic['AwayPlayers'] = self._away_players.to_dicts
         dic['HomePlayers'] = self._home_players.to_dicts
         return dic
