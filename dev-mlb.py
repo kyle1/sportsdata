@@ -1,11 +1,12 @@
 import pandas as pd
+import requests
 #from sportsdata.mlb.boxscore import Boxscore, Boxscores
 from sportsdata.mlb.boxscore import GameBoxscore, GameBoxscores
-from sportsdata.mlb.game import Game, Games
+# from sportsdata.mlb.game import Game, Games
 #from sportsdata.mlb.gameboxscore import GameBoxscore, GameBoxscores
 #from sportsdata.mlb.injury import Injury
 from sportsdata.mlb.odds import GameOdds, GamesOdds
-from sportsdata.mlb.playbyplay import PlayByPlays, PlayByPlay, Play
+from sportsdata.mlb.playbyplay import PlayByPlay, Play
 from sportsdata.mlb.player import Player, Players
 #from sportsdata.mlb.playerboxscore import PlayerBoxscore, PlayerBoxscores
 #from sportsdata.mlb.salary import Salary
@@ -29,7 +30,9 @@ from sportsdata.mlb.team import Team, Teams
 # schedule = Schedule(season=2019)
 # print(schedule.dataframes)
 
-box = GameBoxscore(565895)
-box_df = box.dataframe
-print(box_df)
-box_df.to_csv('box.csv')
+BASE_URL = 'https://localhost:44374/api/'
+
+boxscores = GameBoxscores(date='10/30/2019')
+boxscore_dicts = boxscores.to_dicts
+
+response = requests.post(url=BASE_URL + 'mlb/boxscores', json=boxscore_dicts, verify=False).json()

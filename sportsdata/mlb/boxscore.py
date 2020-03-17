@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 from dateutil import tz
 from time import sleep
 
+# todo- check base/bases on balls
+
 
 class PlayerBoxscore:
     """
@@ -24,6 +26,7 @@ class PlayerBoxscore:
     box_json : dict
         Dict that contains the player's boxscore data.
     """
+
     def __init__(self, game, team, box_json):
         self._mlb_player_id = None
         self._mlb_game_id = None
@@ -184,6 +187,12 @@ class PlayerBoxscore:
         }
         return pd.DataFrame([fields_to_include], index=None)
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        return dic
+
 
 class PlayerBoxscores:
     """
@@ -200,6 +209,7 @@ class PlayerBoxscores:
     players_json : list (dict)
         List of dicts that contains the players' boxscore data.
     """
+
     def __init__(self, game, team, players_json):
         self._boxscores = []
 
@@ -224,6 +234,13 @@ class PlayerBoxscores:
             frames.append(boxscore.dataframe)
         return pd.concat(frames)
 
+    @property
+    def to_dicts(self):
+        dics = []
+        for boxscore in self.__iter__():
+            dics.append(boxscore.to_dict)
+        return dics
+
 
 class GameBoxscore:
     """
@@ -234,6 +251,7 @@ class GameBoxscore:
     game_id : int
         The game ID according to MLB's API.
     """
+
     def __init__(self, game_id):
         self._mlb_game_id = None
         self._season = None
@@ -254,7 +272,7 @@ class GameBoxscore:
         self._away_home_runs = None
         self._away_strikeouts = None
         self._away_base_on_balls = None
-        self._away_intentional_bases_on_balls = None
+        self._away_intentional_base_on_balls = None
         self._away_hits = None
         self._away_hit_by_pitch = None
         self._away_at_bats = None
@@ -438,6 +456,15 @@ class GameBoxscore:
         }
         return pd.DataFrame([fields_to_include], index=[self._mlb_game_id])
 
+    @property
+    def to_dict(self):
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        #dic['GameDateTime'] = dic['GameDateTime'].isoformat()
+        dic['AwayPlayers'] = self._away_players.to_dicts
+        dic['HomePlayers'] = self._home_players.to_dicts
+        return dic
+
 
 class GameBoxscores:
     """
@@ -455,6 +482,7 @@ class GameBoxscores:
     date : string
         Date to get game boxscores from ('MM/DD/YYYY' format).
     """
+
     def __init__(self, **kwargs):
         self._boxscores = []
 
@@ -505,3 +533,10 @@ class GameBoxscores:
         for boxscore in self.__iter__():
             frames.append(boxscore.dataframe)
         return pd.concat(frames)
+
+    @property
+    def to_dicts(self):
+        dics = []
+        for boxscore in self.__iter__():
+            dics.append(boxscore.to_dict)
+        return dics
