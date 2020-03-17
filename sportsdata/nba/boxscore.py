@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-from constants import PROXIES, NBA_REQUEST_HEADERS
+from constants import NBA_REQUEST_PROXIES, NBA_REQUEST_HEADERS
 from datetime import datetime, timedelta
 from time import sleep
 
@@ -162,7 +162,7 @@ class PlayerBoxscores:
             url = f'https://stats.nba.com/stats/boxscoretraditionalv2/?gameId={game._nba_game_id_str}&startPeriod=1&endPeriod=1&startRange=0&endRange=0&rangeType=0&startRange=0'
             print(url)
             boxscore_data = requests.get(
-                url, PROXIES, headers=NBA_REQUEST_HEADERS, timeout=10).json()
+                url, NBA_REQUEST_PROXIES, headers=NBA_REQUEST_HEADERS, timeout=10).json()
             for results in boxscore_data['resultSets']:
                 if results['name'] != 'PlayerStats':
                     # Skip team-based stats

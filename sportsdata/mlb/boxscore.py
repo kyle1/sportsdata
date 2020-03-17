@@ -487,6 +487,7 @@ class GameBoxscores:
 
         if 'season' in kwargs:
             start_date, end_date = get_dates_by_season(kwargs['season'])
+            return
         elif 'range' in kwargs:
             start_date, end_date = kwargs['range'][0], kwargs['range'][1]
         elif 'date' in kwargs:

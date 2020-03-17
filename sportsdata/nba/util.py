@@ -1,5 +1,5 @@
 import pandas as pd
-from constants import NBA_SEASONS
+from .constants import NBA_SEASONS
 
 
 def get_dates_by_season(season):

@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
-from constants import NBA_API_TEAMS
+from .constants import NBA_API_TEAMS
 
 
 class Team:
@@ -25,7 +25,7 @@ class Team:
 
         self._parse_team(team_json)
 
-    def _set_team(self, team):
+    def _parse_team(self, team):
         setattr(self, '_nba_team_id', team['team_id'])
         setattr(self, '_team_name', team['team_name'])
         #setattr(self, '_nba_venue_id', team['venue']['id']) #TODO

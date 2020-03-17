@@ -1,7 +1,7 @@
-import nba.util
 import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
+from .util import get_dates_by_season
 from datetime import datetime, timedelta
 from dateutil import tz
 
@@ -88,7 +88,10 @@ class Schedule:
 
         if 'season' in kwargs:
             season = kwargs['season']
-            start_date, end_date = nba.util.get_dates_by_season(season)
+            start_date, end_date = get_dates_by_season(season)
+            print(start_date)
+            print(end_date)
+            return
         elif 'range' in kwargs:
             start_date = kwargs['range'][0]
             end_date = kwargs['range'][1]

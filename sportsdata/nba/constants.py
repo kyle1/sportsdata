@@ -2,7 +2,7 @@ NBA_SEASONS = [
     {'season': 2018, 'start_date': '10/16/2018', 'end_date': '06/13/2019'},
     {'season': 2019, 'start_date': '10/22/2019', 'end_date': '04/15/2020'}]
 
-PROXIES = {'https:': '41.76.218.96:8080'}
+NBA_REQUEST_PROXIES = {'https:': '41.76.218.96:8080'}
 
 # Without the header below, python can't make the request to the endpoint
 # This was taken from https://github.com/swar/nba_api/
