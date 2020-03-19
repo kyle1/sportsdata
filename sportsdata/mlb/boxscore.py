@@ -1,11 +1,11 @@
 import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
+from ..util import utc_to_pst
 from .playbyplay import PlayByPlay
 from .schedule import Schedule
 from .util import get_dates_by_season
-from datetime import datetime, timedelta
-from dateutil import tz
+from datetime import datetime
 from time import sleep
 
 # todo- check base/bases on balls
@@ -320,9 +320,7 @@ class GameBoxscore:
         print(f'Getting game data from {url}')
         game = requests.get(url, verify=VERIFY_REQUESTS).json()
         utc = datetime.strptime(game['gameData']['datetime']['dateTime'], '%Y-%m-%dT%H:%M:%SZ')
-        from_zone = tz.gettz('UTC')
-        to_zone = tz.gettz('America/Los_Angeles')
-        game_dt = utc.replace(tzinfo=from_zone).astimezone(to_zone).replace(tzinfo=None)
+        game_dt = utc_to_pst(utc)
         setattr(self, '_season', game['gameData']['game']['season'])
         setattr(self, '_game_date_time', game_dt.isoformat())
         setattr(self, '_game_date', game_dt.date().isoformat())
@@ -333,9 +331,9 @@ class GameBoxscore:
         url = f'https://statsapi.mlb.com/api/v1/game/{game_id}/boxscore'
         print(f'Getting game boxscore data from {url}')
         box = requests.get(url, verify=VERIFY_REQUESTS).json()
-        away_team = box['teams']['away']['team']
+        away_team = box['teams']['away']['team'] #todo
         away_team_stats = box['teams']['away']['teamStats']
-        home_team = box['teams']['away']['team']
+        home_team = box['teams']['away']['team'] #todo
         home_team_stats = box['teams']['home']['teamStats']
         setattr(self, '_away_team_id', away_team['id'])
         setattr(self, '_away_record_wins', away_team['record']['leagueRecord']['wins'])
@@ -506,8 +504,8 @@ class GameBoxscores:
 
     def _get_game_boxscores(self, start_date, end_date):
         url = f'https://statsapi.mlb.com/api/v1/schedule?startDate={start_date}&endDate={end_date}&sportId=1'
-        print('Getting games from ' + url)
-        games = requests.get(url, verify=VERIFY_REQUESTS).json()
+        print('Getting MLB schedule from ' + url)
+        schedule = requests.get(url, verify=VERIFY_REQUESTS).json()
         for date in games['dates']:
             for game_data in date['games']:
                 series_desc = game_data['seriesDescription']

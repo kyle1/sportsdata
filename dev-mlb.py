@@ -34,6 +34,7 @@ from sportsdata.mlb.team import Team, Teams
 boxscores = GameBoxscores(date='10/30/2019')
 boxscore_dicts = boxscores.to_dicts
 print(boxscore_dicts)
+boxscores.dataframes.to_csv('boxscores.csv')
 # response = requests.post(url=BASE_URL + 'mlb/boxscores', json=boxscore_dicts, verify=False).json()
 
 # players = Players(2019)

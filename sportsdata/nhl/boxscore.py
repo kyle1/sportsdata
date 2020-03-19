@@ -1,8 +1,8 @@
 import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
-from datetime import datetime, timedelta
-from dateutil import tz
+from ..util import utc_to_pst
+from datetime import datetime
 from time import sleep
 
 
@@ -270,14 +270,14 @@ class PlayerBoxscores:
                                 {'player_id': shooter_id, 'shootout_goals': 1})
         return shootout_goals
 
-    def _get_player_boxscores(self, game, team, players_json):
+    def _get_player_boxscores(self, game, team, players):
         shootout_goals = {} #todo
         goalies_recorded = 0
-        for player, stats in players_json['players'].items():
+        for player, stats in players.items():
             # Need to get the number of goalies recorded for fantasy point bonus eligibility
             if 'goalieStats' in stats['stats']:
                 goalies_recorded += 1
-        for player, stats in players_json['players'].items():
+        for player, stats in players.items():
             boxscore = PlayerBoxscore(game, team, stats, shootout_goals, goalies_recorded)
             if boxscore._nhl_player_id:  # some players don't have any stats
                 self._boxscores.append(boxscore)
@@ -311,9 +311,9 @@ class GameBoxscore:
         self._season = None
         self._game_date_time = None
         self._game_date = None
-        #self._game_status = None
+        self._game_status = None
         self._away_team_id = None
-        self._away_pim = None #what is this?
+        self._away_pim = None
         self._away_shots = None
         self._away_pp_pct = None
         self._away_pp_goals = None
@@ -324,7 +324,7 @@ class GameBoxscore:
         self._away_giveaways = None
         self._away_hits = None
         self._home_team_id = None
-        self._home_pim = None #what is this?
+        self._home_pim = None
         self._home_shots = None
         self._home_pp_pct = None
         self._home_pp_goals = None
@@ -343,36 +343,37 @@ class GameBoxscore:
         self._get_game_boxscore(game_id)
 
     def _get_game_boxscore(self, game_id):
-        url = f'https://statsapi.web.nhl.com/api/v1/game/{game_id}/boxscore'
-        print(f'getting game boxscore data from {url}')
-        game = requests.get(url, verify=VERIFY_REQUESTS).json()
-
-        from_zone = tz.gettz('UTC')
-        to_zone = tz.gettz('America/Los_Angeles')
-        # utc = datetime.strptime(game['gameDate'], '%Y-%m-%dT%H:%M:%SZ')
-        # utc = utc.replace(tzinfo=from_zone)
-        # pst = utc.astimezone(to_zone)
-        # game_dt = pst.replace(tzinfo=None)
-        # has_overtime = False
-        # result_note = ''
-        # for period in game['linescore']['periods']:
-        #     if period['num'] >= 4:
-        #         has_overtime = True
-        #         result_note = period['ordinalNum']  # OT, 2OT, etc.
-        # has_shootout = game['linescore']['hasShootout']
-        # if has_shootout:
-        #     result_note = "SO"  # Override "OT" note
-
-        away_team_stats = game['teams']['away']['teamStats']['teamSkaterStats']
-        home_team_stats = game['teams']['home']['teamStats']['teamSkaterStats']
-
         setattr(self, '_nhl_game_id', game_id)
-        #setattr(self, '_season', int(game['season'][:4])),
-        #setattr(self, '_game_date_time', game_dt.isoformat())
-        #setattr(self, '_game_date', game_dt.date().isoformat())
-        #setattr(self, '_game_time', game_dt.time().isoformat())
-        #setattr(self, '_game_status', game['status']['detailedState'])
-        setattr(self, '_away_team_id', game['teams']['away']['team']['id'])
+
+        url = f'https://statsapi.web.nhl.com/api/v1/game/{game_id}/feed/live'
+        print(f'Getting game data from {url}')
+        game = requests.get(url, verify=VERIFY_REQUESTS).json()
+        utc = datetime.strptime(game['gameData']['datetime']['dateTime'], '%Y-%m-%dT%H:%M:%SZ')
+        game_dt = utc_to_pst(utc)
+        setattr(self, '_season', int(game['gameData']['game']['season'][:4])),
+        setattr(self, '_game_date_time', game_dt.isoformat())
+        setattr(self, '_game_date', game_dt.date().isoformat())
+        setattr(self, '_game_time', game_dt.time().isoformat())
+        setattr(self, '_game_status', game['gameData']['status']['detailedState'])
+
+        has_overtime = False
+        result_note = ''
+        for period in game['liveData']['linescore']['periods']:
+            if period['num'] >= 4:
+                has_overtime = True
+                result_note = period['ordinalNum']  # OT, 2OT, etc.
+        has_shootout = game['liveData']['linescore']['hasShootout']
+        if has_shootout:
+            result_note = "SO"  # Override "OT" note
+
+        url = f'https://statsapi.web.nhl.com/api/v1/game/{game_id}/boxscore'
+        print(f'Getting game boxscore data from {url}')
+        box = requests.get(url, verify=VERIFY_REQUESTS).json()
+        away_team = box['teams']['away'] #todo
+        away_team_stats = box['teams']['away']['teamStats']['teamSkaterStats']
+        home_team = box['teams']['away'] #todo
+        home_team_stats = box['teams']['home']['teamStats']['teamSkaterStats']
+        setattr(self, '_away_team_id', game['gameData']['teams']['away']['id'])
         setattr(self, '_away_goals', away_team_stats['goals'])
         setattr(self, '_away_pim', away_team_stats['pim'])
         setattr(self, '_away_shots', away_team_stats['shots'])
@@ -384,7 +385,7 @@ class GameBoxscore:
         setattr(self, '_away_takeaways', away_team_stats['takeaways'])
         setattr(self, '_away_giveaways', away_team_stats['giveaways'])
         setattr(self, '_away_hits', away_team_stats['hits'])
-        setattr(self, '_home_team_id', game['teams']['home']['team']['id'])
+        setattr(self, '_home_team_id', game['gameData']['teams']['home']['id'])
         setattr(self, '_home_goals', home_team_stats['goals'])
         setattr(self, '_home_pim', home_team_stats['pim'])
         setattr(self, '_home_shots', home_team_stats['shots'])
@@ -396,25 +397,25 @@ class GameBoxscore:
         setattr(self, '_home_takeaways', home_team_stats['takeaways'])
         setattr(self, '_home_giveaways', home_team_stats['giveaways'])
         setattr(self, '_home_hits', home_team_stats['hits'])
-        #setattr(self, '_nhl_venue_id', None if 'id' not in game['venue'] else game['venue']['id'])
-        #setattr(self, '_nhl_venue_name', game['venue']['name'])
-        #setattr(self, '_result_note', result_note)
-        #setattr(self, '_overtime', has_overtime)
-        #setattr(self, '_shootout', has_shootout)
+        setattr(self, '_nhl_venue_id', None if 'id' not in game['gameData']['venue'] else game['gameData']['venue']['id'])
+        setattr(self, '_nhl_venue_name', game['gameData']['venue']['name'])
+        setattr(self, '_result_note', result_note)
+        setattr(self, '_overtime', has_overtime)
+        setattr(self, '_shootout', has_shootout)
 
-        setattr(self, '_away_players', PlayerBoxscores(self, 'away', game['teams']['away']))
-        setattr(self, '_home_players', PlayerBoxscores(self, 'home', game['teams']['home']))
-        #setattr(self, '_play_by_play', PlayByPlay(game_id))
+        setattr(self, '_away_players', PlayerBoxscores(self, 'away', box['teams']['away']['players']))
+        setattr(self, '_home_players', PlayerBoxscores(self, 'home', box['teams']['home']['players']))
+        #setattr(self, '_play_by_play', PlayByPlay(game_id)) #todo- when this is setup, maybe use this data to get player shootout scores for player boxscores?
 
     @property
     def dataframe(self):
         fields_to_include = {
             'NhlGameId': self._nhl_game_id,
-            #'Season': self._season,
-            #'GameDateTime': self._game_date_time,
-            #'GameDate': self._game_date,
-            #'GameTime': self._game_time,
-            #'GameStatus': self._game_status,
+            'Season': self._season,
+            'GameDateTime': self._game_date_time,
+            'GameDate': self._game_date,
+            'GameTime': self._game_time,
+            'GameStatus': self._game_status,
             'AwayTeamId': self._away_team_id,
             'AwayGoals': self._away_goals,
             'AwayPim': self._away_pim,
@@ -438,12 +439,12 @@ class GameBoxscore:
             'HomeBlocked': self._home_blocked,
             'HomeTakeaways': self._home_takeaways,
             'HomeGiveaways': self._home_giveaways,
-            'HomeHits': self._home_hits#,
-            # 'NhlVenueId': self._nhl_venue_id,
-            # 'NhlVenueName': self._nhl_venue_name,
-            # 'ResultNote': self._result_note,
-            # 'Overtime': self._overtime,
-            # 'Shootout': self._shootout
+            'HomeHits': self._home_hits,
+            'NhlVenueId': self._nhl_venue_id,
+            'NhlVenueName': self._nhl_venue_name,
+            'ResultNote': self._result_note,
+            'Overtime': self._overtime,
+            'Shootout': self._shootout
         }
         return pd.DataFrame([fields_to_include], index=[self._nhl_game_id])
 
@@ -482,7 +483,7 @@ class GameBoxscores:
 
     def _get_game_boxscores(self, start_date, end_date):
         url = f'https://statsapi.web.nhl.com/api/v1/schedule?startDate={start_date}&endDate={end_date}&expand=schedule.linescore'
-        #print('Getting games from ' + url)
+        print('Getting NHL schedule from ' + url)
         games = requests.get(url, verify=VERIFY_REQUESTS).json()
         for date in games['dates']:
             for game_data in date['games']:

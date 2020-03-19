@@ -300,10 +300,11 @@ class GameBoxscores:
 
     def _get_games(self, season, start_date, end_date):
         url = f'http://data.nba.com/data/10s/v2015/json/mobile_teams/nba/{season}/league/00_full_schedule.json'  # todo
-        games = requests.get(url).json()
+        print('Getting NBA schedule from ' + url)
+        schedule = requests.get(url, verify=VERIFY_REQUESTS).json()
         begin = datetime.strptime(start_date, '%m/%d/%Y').date()
         end = datetime.strptime(end_date, '%m/%d/%Y').date()
-        for item in games['lscd']:
+        for item in schedule['lscd']:
             for game_data in item['mscd']['g']:
                 game_dt = datetime.strptime(game_data['etm'], '%Y-%m-%dT%H:%M:%S') + timedelta(hours=-3)
                 game_date = game_dt.date()

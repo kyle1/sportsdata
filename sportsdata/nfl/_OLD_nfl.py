@@ -77,25 +77,6 @@ def validate_weeks(weeks):
     return valid_weeks
 
 
-def get_season_by_date_range(date_strings):
-    begin = datetime.strptime(date_strings[0], '%m/%d/%Y')
-    end = datetime.strptime(date_strings[1], '%m/%d/%Y')
-    for season in seasons:
-        if begin >= datetime.strptime(season['start_date'], '%m/%d/%Y') and end <= datetime.strptime(season['end_date'], '%m/%d/%Y'):
-            return season['season']
-    print('Unable to find season for the specified date range')
-    return None
-
-
-def get_season_by_date(date_string):
-    date = datetime.strptime(date_string, '%m/%d/%Y')
-    for season in seasons:
-        if date >= datetime.strptime(season['start_date'], '%m/%d/%Y') and date <= datetime.strptime(season['end_date'], '%m/%d/%Y'):
-            return season['season']
-    print('Unable to find season for the specified date range')
-    return None
-
-
 def get_nfl_week(date):
     for week in nfl_weeks:
         begin = datetime.strptime(week['start_date'], '%m/%d/%Y')

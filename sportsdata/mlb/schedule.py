@@ -1,8 +1,9 @@
 import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
+from ..util import utc_to_pst
 from .util import get_dates_by_season
-from datetime import datetime, timedelta
+from datetime import datetime
 from dateutil import tz
 
 
@@ -35,9 +36,7 @@ class Game:
 
     def _parse_game(self, game):
         utc = datetime.strptime(game['gameDate'], '%Y-%m-%dT%H:%M:%SZ')
-        from_zone = tz.gettz('UTC')
-        to_zone = tz.gettz('America/Los_Angeles')
-        game_dt = utc.replace(tzinfo=from_zone).astimezone(to_zone).replace(tzinfo=None)
+        game_dt = utc_to_pst(utc)
         setattr(self, '_mlb_game_id', game['gamePk'])
         setattr(self, '_season', game['seasonDisplay'])
         setattr(self, '_game_date', game_dt.date().isoformat())

@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
-from datetime import datetime, timedelta
+from datetime import datetime
 from dateutil import tz
 
 

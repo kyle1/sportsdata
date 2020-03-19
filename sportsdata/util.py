@@ -1,31 +1,36 @@
 from datetime import datetime
+from dateutil import tz
+
+# def get_season_by_date_range(date_strings, seasons):
+#     begin = datetime.strptime(date_strings[0], '%m/%d/%Y')
+#     end = datetime.strptime(date_strings[1], '%m/%d/%Y')
+#     for season in seasons:
+#         if begin >= datetime.strptime(season['start_date'], '%m/%d/%Y') and end <= datetime.strptime(season['end_date'], '%m/%d/%Y'):
+#             return season['season']
+#     print('Unable to find season for the specified date range')
+#     return None
 
 
-def get_season_by_date_range(date_strings, seasons):
-    begin = datetime.strptime(date_strings[0], '%m/%d/%Y')
-    end = datetime.strptime(date_strings[1], '%m/%d/%Y')
-    for season in seasons:
-        if begin >= datetime.strptime(season['start_date'], '%m/%d/%Y') and end <= datetime.strptime(season['end_date'], '%m/%d/%Y'):
-            return season['season']
-    print('Unable to find season for the specified date range')
-    return None
+# def get_season_by_date(date_string, seasons):
+#     date = datetime.strptime(date_string, '%m/%d/%Y')
+#     for season in seasons:
+#         if date >= datetime.strptime(season['start_date'], '%m/%d/%Y') and date <= datetime.strptime(season['end_date'], '%m/%d/%Y'):
+#             return season['season']
+#     print('Unable to find season for the specified date range')
+#     return None
 
 
-def get_season_by_date(date_string, seasons):
-    date = datetime.strptime(date_string, '%m/%d/%Y')
-    for season in seasons:
-        if date >= datetime.strptime(season['start_date'], '%m/%d/%Y') and date <= datetime.strptime(season['end_date'], '%m/%d/%Y'):
-            return season['season']
-    print('Unable to find season for the specified date range')
-    return None
+# def get_start_and_end_dates_by_season(season, seasons):
+#     for season in seasons:
+#         if season['season'] == args.season:
+#             return season['start_date'], season['end_date']
+#     print('Unable to find start and end dates for ' + season)
 
-
-def get_start_and_end_dates_by_season(season, seasons):
-    for season in seasons:
-        if season['season'] == args.season:
-            return season['start_date'], season['end_date']
-    print('Unable to find start and end dates for ' + season)
-
+def utc_to_pst(utc):
+    from_zone = tz.gettz('UTC')
+    to_zone = tz.gettz('America/Los_Angeles')
+    pst = utc.replace(tzinfo=from_zone).astimezone(to_zone).replace(tzinfo=None)
+    return pst
 
 def set_odds(GameOdds, odds):
     setattr(GameOdds, '_event_description', odds['description'])
