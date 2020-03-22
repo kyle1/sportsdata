@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 from ..constants import VERIFY_REQUESTS
 from ..util import utc_to_pst
+from .playbyplay import PlayByPlay
 from datetime import datetime
 from time import sleep
 
@@ -27,6 +28,7 @@ class PlayerBoxscore:
     goalies_recorded : int
         Number of goalies on the player's team that played in the game.
     """
+
     def __init__(self, game, team, box_json, shootout_goals, goalies_recorded):
         self._nhl_player_id = None
         self._nhl_game_id = None
@@ -111,7 +113,7 @@ class PlayerBoxscore:
             setattr(self, '_skater_short_handed_goals', skater_stats['shortHandedGoals'])
             setattr(self, '_skater_short_handed_assists', skater_stats['shortHandedAssists'])
             setattr(self, '_skater_blocked', skater_stats['blocked'])
-            setattr(self, '_skater_plus_minus',skater_stats['plusMinus'])
+            setattr(self, '_skater_plus_minus', skater_stats['plusMinus'])
             setattr(self, '_skater_even_time_on_ice', skater_stats['evenTimeOnIce'])
             setattr(self, '_skater_power_play_time_on_ice', skater_stats['powerPlayTimeOnIce'])
             setattr(self, '_skater_short_handed_time_on_ice', skater_stats['shortHandedTimeOnIce'])
@@ -235,6 +237,7 @@ class PlayerBoxscores:
     players_json : list (dict)
         List of dicts that contains the players' boxscore data.
     """
+
     def __init__(self, game, team, players_json):
         self._boxscores = []
 
@@ -271,7 +274,7 @@ class PlayerBoxscores:
         return shootout_goals
 
     def _get_player_boxscores(self, game, team, players):
-        shootout_goals = {} #todo
+        shootout_goals = {}  # todo
         goalies_recorded = 0
         for player, stats in players.items():
             # Need to get the number of goalies recorded for fantasy point bonus eligibility
@@ -306,6 +309,7 @@ class GameBoxscore:
     game_id : int
         A game ID according to NHL's API.
     """
+
     def __init__(self, game_id):
         self._nhl_game_id = None
         self._season = None
@@ -366,12 +370,13 @@ class GameBoxscore:
         if has_shootout:
             result_note = "SO"  # Override "OT" note
 
-        url = f'https://statsapi.web.nhl.com/api/v1/game/{game_id}/boxscore'
-        print(f'Getting game boxscore data from {url}')
-        box = requests.get(url, verify=VERIFY_REQUESTS).json()
-        away_team = box['teams']['away'] #todo
+        # url = f'https://statsapi.web.nhl.com/api/v1/game/{game_id}/boxscore'
+        # print(f'Getting game boxscore data from {url}')
+        # box = requests.get(url, verify=VERIFY_REQUESTS).json()
+        box = game['liveData']['boxscore']
+        away_team = box['teams']['away']  # todo
         away_team_stats = box['teams']['away']['teamStats']['teamSkaterStats']
-        home_team = box['teams']['away'] #todo
+        home_team = box['teams']['away']  # todo
         home_team_stats = box['teams']['home']['teamStats']['teamSkaterStats']
         setattr(self, '_away_team_id', game['gameData']['teams']['away']['id'])
         setattr(self, '_away_goals', away_team_stats['goals'])
@@ -397,15 +402,19 @@ class GameBoxscore:
         setattr(self, '_home_takeaways', home_team_stats['takeaways'])
         setattr(self, '_home_giveaways', home_team_stats['giveaways'])
         setattr(self, '_home_hits', home_team_stats['hits'])
-        setattr(self, '_nhl_venue_id', None if 'id' not in game['gameData']['venue'] else game['gameData']['venue']['id'])
+        setattr(self, '_nhl_venue_id', None if 'id' not in game['gameData']
+                ['venue'] else game['gameData']['venue']['id'])
         setattr(self, '_nhl_venue_name', game['gameData']['venue']['name'])
         setattr(self, '_result_note', result_note)
         setattr(self, '_overtime', has_overtime)
         setattr(self, '_shootout', has_shootout)
 
+        plays = game['liveData']['plays']['allPlays']
+        print(plays)
+
         setattr(self, '_away_players', PlayerBoxscores(self, 'away', box['teams']['away']['players']))
         setattr(self, '_home_players', PlayerBoxscores(self, 'home', box['teams']['home']['players']))
-        #setattr(self, '_play_by_play', PlayByPlay(game_id)) #todo- when this is setup, maybe use this data to get player shootout scores for player boxscores?
+        setattr(self, '_play_by_play', PlayByPlay(game_id, plays))
 
     @property
     def dataframe(self):
@@ -458,7 +467,7 @@ class GameBoxscore:
 
 
 class GameBoxscores:
-    #todo- setup kwargs like MLB GameBoxscores ?
+    # todo- setup kwargs like MLB GameBoxscores ?
     """
     Game stats from multiple NHL games.
 
@@ -470,6 +479,7 @@ class GameBoxscores:
     end_date : string
         End date to get game boxscores from ('MM/DD/YYYY' format)
     """
+
     def __init__(self, start_date, end_date):
         self._boxscores = []
 

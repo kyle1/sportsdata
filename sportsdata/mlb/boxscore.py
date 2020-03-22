@@ -331,9 +331,10 @@ class GameBoxscore:
         url = f'https://statsapi.mlb.com/api/v1/game/{game_id}/boxscore'
         print(f'Getting game boxscore data from {url}')
         box = requests.get(url, verify=VERIFY_REQUESTS).json()
-        away_team = box['teams']['away']['team'] #todo
+        #box = game['liveData']['boxscore']
+        away_team = box['teams']['away']['team']  # todo
         away_team_stats = box['teams']['away']['teamStats']
-        home_team = box['teams']['away']['team'] #todo
+        home_team = box['teams']['away']['team']  # todo
         home_team_stats = box['teams']['home']['teamStats']
         setattr(self, '_away_team_id', away_team['id'])
         setattr(self, '_away_record_wins', away_team['record']['leagueRecord']['wins'])
@@ -506,7 +507,7 @@ class GameBoxscores:
         url = f'https://statsapi.mlb.com/api/v1/schedule?startDate={start_date}&endDate={end_date}&sportId=1'
         print('Getting MLB schedule from ' + url)
         schedule = requests.get(url, verify=VERIFY_REQUESTS).json()
-        for date in games['dates']:
+        for date in schedule['dates']:
             for game_data in date['games']:
                 series_desc = game_data['seriesDescription']
 

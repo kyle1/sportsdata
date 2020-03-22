@@ -3,7 +3,8 @@ import requests
 from ..constants import VERIFY_REQUESTS
 from time import sleep
 
-#TODO- change this from nhl to mlb
+# TODO- change this from nhl to mlb
+
 
 class Play:
     """
@@ -17,81 +18,61 @@ class Play:
     play_json : dict
         Dict that contains play information.
     """
-    def __init__(self, game_id, play_json):
-        self._mlb_game_id = None
-        self._result_type = None
-        self._event = None
-        self._event_type = None
-        self._description = None
-        self._rbi = None
-        self._away_score = None
-        self._home_score = None
-        self._at_bat_index = None
-        self._half_inning = None
-        self._is_top_inning = None
-        self._inning = None
-        self._is_scoring_play = None
-        self._has_out = None
-        self._count_balls = None
-        self._count_strikes = None
-        self._count_outs = None
-        self._batter_id = None
-        self._bat_side = None
-        self._pitcher_id = None
-        self._pitch_hand = None
-        self._men_on_base = None
 
-        setattr(self, '_mlb_game_id', game_id)
+    def __init__(self, game_id, play_json):
+        self._nhl_game_id = None
+        self._nhl_player_1_id = None
+        self._nhl_player_1_type = None
+        self._nhl_player_2_id = None
+        self._nhl_player_2_type = None
+        self._event = None
+        self._description = None
+        self._period = None
+        self._period_type = None
+        self._period_time = None
+        self._period_time_remaining = None
+        self._play_date_time = None
+        self._away_goals = None
+        self._home_goals = None
+
+        setattr(self, '_nhl_game_id', game_id)
         self._get_play_from_json(play_json)
 
     def _get_play_from_json(self, play):
-        setattr(self, '_result_type', play['result']['type'])
+        if 'players' in play:
+            players = play['players']
+            setattr(self, '_nhl_player_1_id', players[0]['player']['id'])
+            setattr(self, '_nhl_player_1_type', players[0]['playerType'])
+            if len(players) > 1:
+                setattr(self, '_nhl_player_2_id', players[1]['player']['id'])
+                setattr(self, '_nhl_player_2_type', players[1]['playerType'])
         setattr(self, '_event', play['result']['event'])
-        setattr(self, '_event_type', play['result']['eventType'])
         setattr(self, '_description', play['result']['description'])
-        setattr(self, '_rbi', play['result']['rbi'])
-        setattr(self, '_away_score', play['result']['awayScore'])
-        setattr(self, '_home_score', play['result']['homeScore'])
-        setattr(self, '_at_bat_index', play['about']['atBatIndex'])
-        setattr(self, '_half_inning', play['about']['halfInning'])
-        setattr(self, '_is_top_inning', play['about']['isTopInning'])
-        setattr(self, '_inning', play['about']['inning'])
-        setattr(self, '_is_scoring_play', play['about']['isScoringPlay'])
-        setattr(self, '_has_out', play['about']['hasOut'])
-        setattr(self, '_count_balls', play['count']['balls'])
-        setattr(self, '_count_strikes', play['count']['strikes'])
-        setattr(self, '_count_outs', play['count']['outs'])
-        setattr(self, '_batter_id', play['matchup']['batter']['id'])
-        setattr(self, '_bat_side', play['matchup']['batSide']['code'])
-        setattr(self, '_pitcher_id', play['matchup']['pitcher']['id'])
-        setattr(self, '_pitch_hand', play['matchup']['pitchHand']['code'])
-        setattr(self, '_men_on_base', play['matchup']['splits']['menOnBase'])
+        setattr(self, '_period', play['about']['period'])
+        setattr(self, '_period_type', play['about']['periodType'])
+        setattr(self, '_period_time', play['about']['periodTime'])
+        setattr(self, '_period_time_remaining', play['about']['periodTimeRemaining'])
+        setattr(self, '_play_date_time', play['about']['dateTime'])
+        setattr(self, '_away_goals', play['about']['goals']['away'])
+        setattr(self, '_home_goals', play['about']['goals']['away'])
 
     @property
     def dataframe(self):
         fields_to_include = {
-            'MlbGameId': self._mlb_game_id,
-            'ResultType': self._result_type,
+            'NhlGameId': self._nhl_game_id,
+            'NhlPlayer1Id': self._nhl_player_1_id,
+            'NhlPlayer1Type': self._nhl_player_1_type,
+            'NhlPlayer2Id': self._nhl_player_2_id,
+            'NhlPlayer2Type': self._nhl_player_2_type,
             'Event': self._event,
-            'EventType': self._event_type,
             'Description': self._description,
-            'Rbi': self._rbi,
-            'AwayScore': self._away_score,
-            'HomeScore': self._home_score,
-            'AtBatIndex': self._at_bat_index,
-            'HalfInning': self._half_inning,
-            'IsTopInning': self._is_top_inning,
-            'Inning': self._inning,
-            'IsScoringPlay': self._is_scoring_play,
-            'HasOut': self._has_out,
-            'CountBalls': self._count_balls,
-            'CountStrikes': self._count_strikes,
-            'CountOuts': self._count_outs,
-            'BatterId': self._batter_id,
-            'BatSide': self._bat_side,
-            'PitcherId': self._pitcher_id,
-            'PitchHand': self._pitch_hand,
-            'MenOnBase': self._men_on_base
+            'Period': self._period,
+            'PeriodType': self._period_type,
+            'PeriodTime': self._period_time,
+            'PeriodTimeRemaining': self._period_time_remaining,
+            'PlayDateTime': self._play_date_time,
+            'AwayGoals': self._away_goals,
+            'HomeGoals': self._home_goals
         }
         return pd.DataFrame([fields_to_include], index=None)
 
@@ -100,7 +81,7 @@ class Play:
         dataframe = self.dataframe
         dic = dataframe.to_dict('records')[0]
         return dic
-        
+
 
 class PlayByPlay:
     """
@@ -110,11 +91,15 @@ class PlayByPlay:
     ----------
     game_id : int
         The game ID according to NHL's API.
+
+    plays : dict
+        Dict that contains the play-by-play data.
     """
-    def __init__(self, game_id):
+
+    def __init__(self, game_id, plays):
         self._plays = []
 
-        self._get_play_by_play(game_id)
+        self._parse_play_by_play(game_id, plays)
 
     def __repr__(self):
         return self._plays
@@ -122,11 +107,8 @@ class PlayByPlay:
     def __iter__(self):
         return iter(self.__repr__())
 
-    def _get_play_by_play(self, game_id):
-        url = f'https://statsapi.mlb.com/api/v1/game/{game_id}/playByPlay'
-        print('Getting play-by-play data from ' + url)
-        pbp_json = requests.get(url, verify=VERIFY_REQUESTS).json()
-        for play_json in pbp_json['allPlays']:
+    def _parse_play_by_play(self, game_id, plays):
+        for play_json in plays:
             play = Play(game_id, play_json)
             self._plays.append(play)
 
