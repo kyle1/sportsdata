@@ -1,4 +1,4 @@
-VERIFY_REQUESTS = False
+VERIFY_REQUESTS = True
 
 SPORTS = ['nfl', 'mlb', 'nba', 'nhl']
 

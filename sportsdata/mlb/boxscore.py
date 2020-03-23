@@ -380,7 +380,8 @@ class GameBoxscore:
         setattr(self, '_second_base_official_id', self._get_official_id_by_type(box['officials'], 'Second Base'))
         setattr(self, '_third_base_official_id', self._get_official_id_by_type(box['officials'], 'Third Base'))
 
-        # setattr(self, '_mlb_venue_id', None if 'id' not in game['venue'] else game['venue']['id'])
+        setattr(self, '_mlb_venue_id', None if 'id' not in game['gameData']
+                ['venue'] else game['gameData']['venue']['id'])
         # setattr(self, '_series_description', game['seriesDescription'])
         # setattr(self, '_series_game_number', game['seriesGameNumber'])
         # setattr(self, '_games_in_series', game['gamesInSeries'])
@@ -446,8 +447,8 @@ class GameBoxscore:
             'HomePlateOfficialId': self._home_plate_official_id,
             'FirstBaseOfficialId': self._first_base_official_id,
             'SecondBaseOfficialId': self._second_base_official_id,
-            'ThirdBaseOfficialId': self._third_base_official_id
-            # 'MlbVenueId': self._mlb_venue_id,
+            'ThirdBaseOfficialId': self._third_base_official_id,
+            'MlbVenueId': self._mlb_venue_id,
             # 'SeriesDescription': self._series_description,
             # 'SeriesGameNumber': self._series_game_number,
             # 'GamesInSeries': self._games_in_series,
@@ -524,7 +525,7 @@ class GameBoxscores:
 
                 boxscore = GameBoxscore(game_data['gamePk'])
                 self._boxscores.append(boxscore)
-                sleep(5)
+                sleep(3)
 
     @property
     def dataframes(self):

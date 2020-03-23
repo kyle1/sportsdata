@@ -36,9 +36,9 @@ class Play:
         self._home_goals = None
 
         setattr(self, '_nhl_game_id', game_id)
-        self._get_play_from_json(play_json)
+        self._parse_play(play_json)
 
-    def _get_play_from_json(self, play):
+    def _parse_play(self, play):
         if 'players' in play:
             players = play['players']
             setattr(self, '_nhl_player_1_id', players[0]['player']['id'])

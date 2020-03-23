@@ -16,6 +16,7 @@ class Play:
     play_json : dict
         Dict that contains play information.
     """
+
     def __init__(self, game_id, play_json):
         self._mlb_game_id = None
         self._result_type = None
@@ -41,9 +42,9 @@ class Play:
         self._men_on_base = None
 
         setattr(self, '_mlb_game_id', game_id)
-        self._get_play_from_json(play_json)
+        self._parse_play(play_json)
 
-    def _get_play_from_json(self, play):
+    def _parse_play(self, play):
         setattr(self, '_result_type', play['result']['type'])
         setattr(self, '_event', play['result']['event'])
         setattr(self, '_event_type', play['result']['eventType'])
@@ -99,7 +100,7 @@ class Play:
         dataframe = self.dataframe
         dic = dataframe.to_dict('records')[0]
         return dic
-        
+
 
 class PlayByPlay:
     """
@@ -110,6 +111,7 @@ class PlayByPlay:
     game_id : int
         The game ID according to MLB's API.
     """
+
     def __init__(self, game_id):
         self._plays = []
 
