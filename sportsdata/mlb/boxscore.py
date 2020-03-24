@@ -68,9 +68,9 @@ class PlayerBoxscore:
         self._shutout = None
         self._quality_start = None
 
-        self._get_boxscore_from_json(game, team, box_json)
+        self._parse_player_boxscore(game, team, box_json)
 
-    def _get_boxscore_from_json(self, game, team, box):
+    def _parse_player_boxscore(self, game, team, box):
         has_batting_stats = len(box['stats']['batting']) > 0
         has_pitching_stats = len(box['stats']['pitching']) > 0
         if not has_batting_stats and not has_pitching_stats:
@@ -213,7 +213,7 @@ class PlayerBoxscores:
     def __init__(self, game, team, players_json):
         self._boxscores = []
 
-        self._get_player_boxscores(game, team, players_json)
+        self._parse_player_boxscores(game, team, players_json)
 
     def __repr__(self):
         return self._boxscores
@@ -221,7 +221,7 @@ class PlayerBoxscores:
     def __iter__(self):
         return iter(self.__repr__())
 
-    def _get_player_boxscores(self, game, team, players_json):
+    def _parse_player_boxscores(self, game, team, players_json):
         for player, stats in players_json['players'].items():
             boxscore = PlayerBoxscore(game, team, stats)
             if boxscore._mlb_player_id:  # some players don't have any stats
@@ -240,10 +240,6 @@ class PlayerBoxscores:
         for boxscore in self.__iter__():
             dics.append(boxscore.to_dict)
         return dics
-
-    def to_csv(self, filename):
-        dataframe = self.dataframe
-        dataframe.to_csv(filename)
 
 
 class GameBoxscore:
@@ -547,20 +543,20 @@ class GameBoxscores:
 
     @property
     def player_dataframes(self):
-        players = []
+        frames = []
         for game in self._boxscores:
             away_players = game._away_players.dataframes
             home_players = game._home_players.dataframes
-            players.append(pd.concat([away_players, home_players]))
-        return pd.concat(players)
+            frames.append(pd.concat([away_players, home_players]))
+        return pd.concat(frames)
 
     @property
     def pbp_dataframes(self):
-        pbps = []
+        frames = []
         for game in self._boxscores:
             pbp = game._play_by_play.dataframes
-            pbps.append(pbp)
-        return pd.concat(pbps)
+            frames.append(pbp)
+        return pd.concat(frames)
 
     @property
     def to_dicts(self):
@@ -568,7 +564,3 @@ class GameBoxscores:
         for boxscore in self.__iter__():
             dics.append(boxscore.to_dict)
         return dics
-
-    def to_csv(self, filename):
-        dataframes = self.dataframes
-        dataframes.to_csv(filename, index=False)

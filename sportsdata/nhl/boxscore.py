@@ -77,10 +77,9 @@ class PlayerBoxscore:
         self._goalie_even_strength_save_pct = None
         self._only_goalie = None
 
-        self._get_boxscore_from_json(
-            game, team, box_json, shootout_goals, goalies_recorded)
+        self._parse_player_boxscore(game, team, box_json, shootout_goals, goalies_recorded)
 
-    def _get_boxscore_from_json(self, game, team, box, shootout_goals, goalies_recorded):
+    def _parse_player_boxscore(self, game, team, box, shootout_goals, goalies_recorded):
         has_skater_stats = 'skaterStats' in box['stats'] and len(box['stats']['skaterStats']) > 0
         has_goalie_stats = 'goalieStats' in box['stats'] and len(box['stats']['goalieStats']) > 0
         if not has_skater_stats and not has_goalie_stats:
@@ -241,7 +240,7 @@ class PlayerBoxscores:
     def __init__(self, game, team, players_json):
         self._boxscores = []
 
-        self._get_player_boxscores(game, team, players_json)
+        self._parse_player_boxscores(game, team, players_json)
 
     def __repr__(self):
         return self._boxscores
@@ -273,7 +272,7 @@ class PlayerBoxscores:
                                 {'player_id': shooter_id, 'shootout_goals': 1})
         return shootout_goals
 
-    def _get_player_boxscores(self, game, team, players):
+    def _parse_player_boxscores(self, game, team, players):
         shootout_goals = {}  # todo
         goalies_recorded = 0
         for player, stats in players.items():
@@ -410,7 +409,7 @@ class GameBoxscore:
         setattr(self, '_shootout', has_shootout)
 
         plays = game['liveData']['plays']['allPlays']
-        print(plays)
+        #print(plays)
 
         setattr(self, '_away_players', PlayerBoxscores(self, 'away', box['teams']['away']['players']))
         setattr(self, '_home_players', PlayerBoxscores(self, 'home', box['teams']['home']['players']))
@@ -458,11 +457,18 @@ class GameBoxscore:
         return pd.DataFrame([fields_to_include], index=[self._nhl_game_id])
 
     @property
+    def player_dataframes(self):
+        away_players = self._away_players.dataframes
+        home_players = self._home_players.dataframes
+        return pd.concat([away_players, home_players])
+
+    @property
     def to_dict(self):
         dataframe = self.dataframe
         dic = dataframe.to_dict('records')[0]
         dic['AwayPlayers'] = self._away_players.to_dicts
         dic['HomePlayers'] = self._home_players.to_dicts
+        dic['PlayByPlay'] = self._play_by_play.to_dicts
         return dic
 
 
@@ -506,6 +512,23 @@ class GameBoxscores:
         frames = []
         for boxscore in self.__iter__():
             frames.append(boxscore.dataframe)
+        return pd.concat(frames)
+
+    @property
+    def player_dataframes(self):
+        frames = []
+        for game in self._boxscores:
+            away_players = game._away_players.dataframes
+            home_players = game._home_players.dataframes
+            frames.append(pd.concat([away_players, home_players]))
+        return pd.concat(frames)
+
+    @property
+    def pbp_dataframes(self):
+        frames = []
+        for game in self._boxscores:
+            pbp = game._play_by_play.dataframes
+            frames.append(pbp)
         return pd.concat(frames)
 
     @property
