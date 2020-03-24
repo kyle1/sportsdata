@@ -54,9 +54,9 @@ class PlayerBoxscore:
         self._receiving_long = None
         self._receiving_touchdowns = None
 
-        self._get_boxscore_from_json(box_json, scoring_plays)
+        self._parse_boxscore(box_json, scoring_plays)
 
-    def _get_boxscore_from_json(self, box, scoring_plays):
+    def _parse_boxscore(self, box, scoring_plays):
         setattr(self, '_player_name', box['PlayerName'])
         setattr(self, '_xfl_game_id', box['XflGameId'])
         setattr(self, '_away_team', box['AwayTeam'])
@@ -393,10 +393,8 @@ class GameBoxscore:
         self._home_team_record_pct = None
         self._xfl_venue_id = None
 
-        self._boxscores = None
+        self._players = None
         #self._scoring_plays = None  # todo
-        #self._away_players = None
-        #self._home_players = None
         
         self._away_team = None
         self._home_team = None
@@ -469,8 +467,8 @@ class GameBoxscore:
         setattr(self, '_home_fourth_down_conversions', home_stats['Fourth Down'].split()[0].split('/')[0])
         setattr(self, '_home_fourth_down_attempts', home_stats['Fourth Down'].split()[0].split('/')[1])
 
-        setattr(self, '_boxscores', PlayerBoxscores(self, wd))
-        setattr(self, '_scoring_plays', ScoringPlays(self, wd))
+        setattr(self, '_players', PlayerBoxscores(self, wd))
+        setattr(self, '_scoring_plays', ScoringPlays(self, wd)) #todo
 
     @property
     def dataframe(self):
@@ -577,6 +575,14 @@ class GameBoxscores:
         frames = []
         for game in self.__iter__():
             frames.append(game.dataframe)
+        return pd.concat(frames)
+
+    @property
+    def player_dataframes(self):
+        frames = []
+        for game in self._boxscores:
+            players = game._players.dataframes
+            frames.append(players)
         return pd.concat(frames)
 
     @property

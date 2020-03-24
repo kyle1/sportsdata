@@ -26,10 +26,11 @@ class ScoringPlay:
         self._end_away_score = None
         self._end_home_score = None
 
-        self._parse_scoring_play(game_id, tr)
+        self._parse_scoring_play(game, tr)
 
     def _parse_scoring_play(self, game, tr):
-        div = tr.find_elements_by_class_name('row.playRow.teamRow')[0]
+        #div = tr.find_elements_by_class_name('row.playRow.teamRow')[0]
+        div = tr.find_elements_by_class_name('rlogo')[0]
 
         # Extract team abbreviation from the logo image src tag.
         logo_src = div.find_element_by_tag_name('img').get_attribute('src')
@@ -105,6 +106,7 @@ class ScoringPlays:
         return iter(self.__repr__())
 
     def _get_scoring_plays(self, game, scoring_table):
+        print(scoring_table.text)
         rows = scoring_table.find_elements_by_class_name('body')
         for tr in rows:
             scoring_play = ScoringPlay(game, tr)
