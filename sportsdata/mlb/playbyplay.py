@@ -144,29 +144,3 @@ class PlayByPlay:
         for play in self.__iter__():
             dics.append(play.to_dict)
         return dics
-
-
-# class PlayByPlays:
-#     def __init__(self, games):
-#         self._play_by_plays = []
-
-#         self._get_play_by_plays(games)
-
-#     def __repr__(self):
-#         return self._play_by_plays
-
-#     def __iter__(self):
-#         return iter(self.__repr__())
-
-#     def _get_play_by_plays(self, games):
-#         for game in games:
-#             pbp = PlayByPlay(game._mlb_game_id)
-#             self._play_by_plays.append(pbp)
-#             sleep(5)
-
-#     @property
-#     def dataframes(self):
-#         frames = []
-#         for pbp in self.__iter__():
-#             frames.append(pbp.dataframes)
-#         return pd.concat(frames)

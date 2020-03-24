@@ -35,10 +35,10 @@ BASE_URL = 'https://localhost:44374/api/'
 
 season = '2019'
 
-start_date = datetime.strptime('03/28/2019', '%m/%d/%Y')
-#start_date = datetime.strptime('07/08/2019', '%m/%d/%Y')
-#start_date = datetime.strptime('10/30/2019', '%m/%d/%Y')
+#start_date = datetime.strptime('03/28/2019', '%m/%d/%Y')
+start_date = datetime.strptime('05/17/2019', '%m/%d/%Y')
 end_date = datetime.strptime('10/30/2019', '%m/%d/%Y')
+#end_date = datetime.strptime('3/28/2019', '%m/%d/%Y')
 
 loop_date = start_date
 
@@ -49,6 +49,7 @@ while loop_date <= end_date:
 
     if len(game_boxscores._boxscores) == 0:
         print('No games on ' + date_str)
+        loop_date = loop_date + timedelta(days=1)
         continue
 
     filename_date = datetime.strftime(loop_date, '%Y-%m-%d')
@@ -58,9 +59,15 @@ while loop_date <= end_date:
 
     player_boxscores_path = f'csv/mlb/2019/player_boxscores/{filename_date}_player_boxscores.csv'
     player_dataframes = game_boxscores.player_dataframes
-    player_dataframes.to_csv(f'csv/mlb/2019/player_boxscores/{filename_date}_pd.csv')
+    player_dataframes.to_csv(player_boxscores_path, index=False)
+    # print(player_dataframes)
 
-    #response = requests.post(url=BASE_URL + 'mlb/boxscores', json=game_boxscores.to_dicts, verify=False).json()
+    pbps_path = f'csv/mlb/2019/play_by_plays/{filename_date}_pbp.csv'
+    pbp_dataframes = game_boxscores.pbp_dataframes
+    pbp_dataframes.to_csv(pbps_path, index=False)
+    # print(pbp_dataframes)
+
+    response = requests.post(url=BASE_URL + 'mlb/boxscores', json=game_boxscores.to_dicts, verify=False).json()
 
     loop_date = loop_date + timedelta(days=1)
 

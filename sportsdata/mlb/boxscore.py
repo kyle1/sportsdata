@@ -464,14 +464,15 @@ class GameBoxscore:
     def player_dataframes(self):
         away_players = self._away_players.dataframes
         home_players = self._home_players.dataframes
-        return pd.concat([away_players, home_players]))
+        return pd.concat([away_players, home_players])
 
     @property
     def to_dict(self):
-        dataframe=self.dataframe
-        dic=dataframe.to_dict('records')[0]
-        dic['AwayPlayers']=self._away_players.to_dicts
-        dic['HomePlayers']=self._home_players.to_dicts
+        dataframe = self.dataframe
+        dic = dataframe.to_dict('records')[0]
+        dic['AwayPlayers'] = self._away_players.to_dicts
+        dic['HomePlayers'] = self._home_players.to_dicts
+        dic['PlayByPlay'] = self._play_by_play.to_dicts
         return dic
 
 
@@ -493,15 +494,15 @@ class GameBoxscores:
     """
 
     def __init__(self, **kwargs):
-        self._boxscores=[]
+        self._boxscores = []
 
         if 'season' in kwargs:
-            start_date, end_date=get_dates_by_season(kwargs['season'])
+            start_date, end_date = get_dates_by_season(kwargs['season'])
             return
         elif 'range' in kwargs:
-            start_date, end_date=kwargs['range'][0], kwargs['range'][1]
+            start_date, end_date = kwargs['range'][0], kwargs['range'][1]
         elif 'date' in kwargs:
-            start_date, end_date=kwargs['date'], kwargs['date']
+            start_date, end_date = kwargs['date'], kwargs['date']
         else:
             print('Invalid Game param(s)')
             return
@@ -515,12 +516,12 @@ class GameBoxscores:
         return iter(self.__repr__())
 
     def _get_game_boxscores(self, start_date, end_date):
-        url=f'https://statsapi.mlb.com/api/v1/schedule?startDate={start_date}&endDate={end_date}&sportId=1'
+        url = f'https://statsapi.mlb.com/api/v1/schedule?startDate={start_date}&endDate={end_date}&sportId=1'
         print('Getting MLB schedule from ' + url)
-        schedule=requests.get(url, verify = VERIFY_REQUESTS).json()
+        schedule = requests.get(url, verify=VERIFY_REQUESTS).json()
         for date in schedule['dates']:
             for game_data in date['games']:
-                series_desc=game_data['seriesDescription']
+                series_desc = game_data['seriesDescription']
 
                 if 'Training' in series_desc or 'Exhibition' in series_desc or 'All-Star' in series_desc:
                     continue
@@ -533,33 +534,41 @@ class GameBoxscores:
                 # if game['gamePk'] not i game_ids:
                 #     continue
 
-                boxscore=GameBoxscore(game_data['gamePk'])
+                boxscore = GameBoxscore(game_data['gamePk'])
                 self._boxscores.append(boxscore)
-                sleep(5)
+                sleep(3)
 
     @property
     def dataframes(self):
-        frames=[]
+        frames = []
         for boxscore in self.__iter__():
             frames.append(boxscore.dataframe)
         return pd.concat(frames)
 
     @property
     def player_dataframes(self):
-        players=[]
+        players = []
         for game in self._boxscores:
-            away_players=game._away_players.dataframes
-            home_players=game._home_players.dataframes
+            away_players = game._away_players.dataframes
+            home_players = game._home_players.dataframes
             players.append(pd.concat([away_players, home_players]))
         return pd.concat(players)
 
     @property
+    def pbp_dataframes(self):
+        pbps = []
+        for game in self._boxscores:
+            pbp = game._play_by_play.dataframes
+            pbps.append(pbp)
+        return pd.concat(pbps)
+
+    @property
     def to_dicts(self):
-        dics=[]
+        dics = []
         for boxscore in self.__iter__():
             dics.append(boxscore.to_dict)
         return dics
 
     def to_csv(self, filename):
-        dataframes=self.dataframes
-        dataframes.to_csv(filename)
+        dataframes = self.dataframes
+        dataframes.to_csv(filename, index=False)
