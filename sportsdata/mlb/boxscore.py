@@ -401,6 +401,10 @@ class GameBoxscore:
                 return official['official']['id']
 
     @property
+    def players(self):
+        return self._away_players._boxscores + self._home_players._boxscores
+
+    @property
     def dataframe(self):
         fields_to_include = {
             'MlbGameId': self._mlb_game_id,
@@ -459,12 +463,6 @@ class GameBoxscore:
             # 'ExtraInnings': self._extra_innings
         }
         return pd.DataFrame([fields_to_include], index=[self._mlb_game_id])
-
-    @property
-    def player_dataframes(self):
-        away_players = self._away_players.dataframes
-        home_players = self._home_players.dataframes
-        return pd.concat([away_players, home_players]))
 
     @property
     def to_dict(self):
@@ -545,6 +543,13 @@ class GameBoxscores:
         return pd.concat(frames)
 
     @property
+    def to_dicts(self):
+        dics = []
+        for boxscore in self.__iter__():
+            dics.append(boxscore.to_dict)
+        return dics
+
+    @property
     def player_dataframes(self):
         players = []
         for game in self._boxscores:
@@ -552,13 +557,6 @@ class GameBoxscores:
             home_players = game._home_players.dataframes
             players.append(pd.concat([away_players, home_players]))
         return pd.concat(players)
-
-    @property
-    def to_dicts(self):
-        dics = []
-        for boxscore in self.__iter__():
-            dics.append(boxscore.to_dict)
-        return dics
 
     def to_csv(self, filename):
         dataframes = self.dataframes
