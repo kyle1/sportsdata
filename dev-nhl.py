@@ -1,6 +1,9 @@
+import requests
 from datetime import datetime, timedelta
 from sportsdata.nhl.boxscore import GameBoxscore, GameBoxscores
 
+
+BASE_URL = 'https://localhost:44374/api/'
 
 #game_boxscore = GameBoxscore(2019020196)
 
@@ -24,18 +27,18 @@ while loop_date <= end_date:
     game_boxscores_path = f'csv/nhl/2018/game_boxscores/{filename_date}_game_boxscores.csv'
     game_boxscores_dataframe = game_boxscores.dataframes
     print(game_boxscores_dataframe)
-    game_boxscores_dataframe.to_csv(game_boxscores_path)
+    # game_boxscores_dataframe.to_csv(game_boxscores_path)
 
     player_boxscores_path = f'csv/nhl/2018/player_boxscores/{filename_date}_player_boxscores.csv'
     player_dataframes = game_boxscores.player_dataframes
-    print(player_dataframes)
+    # print(player_dataframes)
     player_dataframes.to_csv(player_boxscores_path, index=False)
 
     pbps_path = f'csv/nhl/2018/play_by_plays/{filename_date}_pbp.csv'
     pbp_dataframes = game_boxscores.pbp_dataframes
-    print(pbp_dataframes)
+    # print(pbp_dataframes)
     pbp_dataframes.to_csv(pbps_path, index=False)
 
-    #response = requests.post(url=BASE_URL + 'nhl/boxscores', json=game_boxscores.to_dicts, verify=False).json()
+    response = requests.post(url=BASE_URL + 'nhl/boxscores', json=game_boxscores.to_dicts, verify=False).json()
 
     loop_date = loop_date + timedelta(days=1)

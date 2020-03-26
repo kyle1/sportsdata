@@ -415,7 +415,6 @@ class GameBoxscore:
         # print(plays)
 
         setattr(self, '_away_players', PlayerBoxscores(self, 'away', box['teams']['away']))
-        print(len(self._away_players._boxscores))
         setattr(self, '_home_players', PlayerBoxscores(self, 'home', box['teams']['home']))
         setattr(self, '_play_by_play', PlayByPlay(game_id, plays))
 
