@@ -500,7 +500,7 @@ class GameBoxscores:
         elif 'date' in kwargs:
             start_date, end_date = kwargs['date'], kwargs['date']
         else:
-            print('Invalid Game param(s)')
+            print('Invalid GameBoxscores param(s)')
             return
 
         self._get_game_boxscores(start_date, end_date)

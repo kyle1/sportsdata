@@ -3,6 +3,7 @@ import requests
 from ..constants import VERIFY_REQUESTS
 from ..util import utc_to_pst
 from .playbyplay import PlayByPlay
+from .util import get_dates_by_season
 from datetime import datetime
 from time import sleep
 
@@ -272,14 +273,14 @@ class PlayerBoxscores:
                                 {'player_id': shooter_id, 'shootout_goals': 1})
         return shootout_goals
 
-    def _parse_player_boxscores(self, game, team, players):
+    def _parse_player_boxscores(self, game, team, players_json):
         shootout_goals = {}  # todo
         goalies_recorded = 0
-        for player, stats in players.items():
+        for player, stats in players_json['players'].items():
             # Need to get the number of goalies recorded for fantasy point bonus eligibility
             if 'goalieStats' in stats['stats']:
                 goalies_recorded += 1
-        for player, stats in players.items():
+        for player, stats in players_json['players'].items():
             boxscore = PlayerBoxscore(game, team, stats, shootout_goals, goalies_recorded)
             if boxscore._nhl_player_id:  # some players don't have any stats
                 self._boxscores.append(boxscore)
@@ -342,6 +343,8 @@ class GameBoxscore:
         self._result_note = None
         self._overtime = None
         self._shootout = None
+        self._away_players = None
+        self._home_players = None
 
         self._get_game_boxscore(game_id)
 
@@ -409,10 +412,11 @@ class GameBoxscore:
         setattr(self, '_shootout', has_shootout)
 
         plays = game['liveData']['plays']['allPlays']
-        #print(plays)
+        # print(plays)
 
-        setattr(self, '_away_players', PlayerBoxscores(self, 'away', box['teams']['away']['players']))
-        setattr(self, '_home_players', PlayerBoxscores(self, 'home', box['teams']['home']['players']))
+        setattr(self, '_away_players', PlayerBoxscores(self, 'away', box['teams']['away']))
+        print(len(self._away_players._boxscores))
+        setattr(self, '_home_players', PlayerBoxscores(self, 'home', box['teams']['home']))
         setattr(self, '_play_by_play', PlayByPlay(game_id, plays))
 
     @property
@@ -473,21 +477,35 @@ class GameBoxscore:
 
 
 class GameBoxscores:
-    # todo- setup kwargs like MLB GameBoxscores ?
     """
-    Game stats from multiple NHL games.
+    Game stats from multiple MLB games.
 
-    Parameters
+    Parameters (kwargs)
     ----------
-    start_date : string
-        Beginning date to get game boxscores from ('MM/DD/YYYY' format)
+    season : int
+        Season (year) to get game boxscores from.
 
-    end_date : string
-        End date to get game boxscores from ('MM/DD/YYYY' format)
+    range : list
+        Date range (inclusive) to get game boxscores from.
+        range[0] = start, range[1] end ('MM/DD/YYYY' format).
+
+    date : string
+        Date to get game boxscores from ('MM/DD/YYYY' format).
     """
 
-    def __init__(self, start_date, end_date):
+    def __init__(self, **kwargs):
         self._boxscores = []
+
+        if 'season' in kwargs:
+            start_date, end_date = get_dates_by_season(kwargs['season'])
+            return
+        elif 'range' in kwargs:
+            start_date, end_date = kwargs['range'][0], kwargs['range'][1]
+        elif 'date' in kwargs:
+            start_date, end_date = kwargs['date'], kwargs['date']
+        else:
+            print('Invalid GameBoxscores param(s)')
+            return
 
         self._get_game_boxscores(start_date, end_date)
 
@@ -503,9 +521,10 @@ class GameBoxscores:
         games = requests.get(url, verify=VERIFY_REQUESTS).json()
         for date in games['dates']:
             for game_data in date['games']:
-                boxscore = GameBoxscore(game_data['gamePk'])
-                self._boxscores.append(boxscore)
-                sleep(5)
+                if game_data['gamePk'] != 2018010110:  # 2018/2019 Koln Haie game
+                    boxscore = GameBoxscore(game_data['gamePk'])
+                    self._boxscores.append(boxscore)
+                    sleep(5)
 
     @property
     def dataframes(self):

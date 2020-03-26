@@ -1,4 +1,14 @@
 import pandas as pd
+from .constants import NHL_SEASONS
+
+
+def get_dates_by_season(season):
+    for dates in NHL_SEASONS:
+        if dates['season'] == season:
+            start_date = dates['start_date']
+            end_date = dates['end_date']
+            break
+    return start_date, end_date
 
 
 def join_dataframes(dataframes, cols, d):

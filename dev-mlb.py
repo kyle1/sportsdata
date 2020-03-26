@@ -36,9 +36,9 @@ BASE_URL = 'https://localhost:44374/api/'
 season = '2019'
 
 #start_date = datetime.strptime('03/28/2019', '%m/%d/%Y')
-start_date = datetime.strptime('03/30/2019', '%m/%d/%Y')
-#end_date = datetime.strptime('10/30/2019', '%m/%d/%Y')
-end_date = datetime.strptime('3/30/2019', '%m/%d/%Y')
+start_date = datetime.strptime('10/16/2019', '%m/%d/%Y')
+end_date = datetime.strptime('10/30/2019', '%m/%d/%Y')
+#end_date = datetime.strptime('3/30/2019', '%m/%d/%Y')
 
 loop_date = start_date
 
@@ -67,7 +67,7 @@ while loop_date <= end_date:
     pbp_dataframes.to_csv(pbps_path, index=False)
     # print(pbp_dataframes)
 
-    #response = requests.post(url=BASE_URL + 'mlb/boxscores', json=game_boxscores.to_dicts, verify=False).json()
+    response = requests.post(url=BASE_URL + 'mlb/boxscores', json=game_boxscores.to_dicts, verify=False).json()
 
     loop_date = loop_date + timedelta(days=1)
 
