@@ -13,6 +13,7 @@ class GameOdds:
     event : dict
         Dict that contains the betting event data.
     """
+
     def __init__(self, odds):
         self._event_description = None
         self._event_start_time = None
@@ -102,6 +103,7 @@ class GamesOdds:
     ----------
     None
     """
+
     def __init__(self):
         self._odds = []
 
@@ -118,7 +120,7 @@ class GamesOdds:
         print('Getting odds from ' + url)
         odds_json = requests.get(url, verify=VERIFY_REQUESTS).json()
         if len(odds_json) == 0:
-            print(f'No NHL odds found.')
+            print(f'No NBA odds found.')
             return
         for event in odds_json[0]['events']:
             if event['type'] != 'GAMEEVENT' or datetime.fromtimestamp(event['startTime']/1000) < datetime.now():
