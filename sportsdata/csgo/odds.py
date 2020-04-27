@@ -6,7 +6,7 @@ from datetime import datetime
 
 class MatchOdds:
     """
-    GMatch-level betting information for an individual CSGO match.
+    Match-level betting information for an individual CSGO match.
 
     Parameters
     ----------
